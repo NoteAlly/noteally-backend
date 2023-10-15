@@ -19,4 +19,7 @@ from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # path('hello/', views.hello, name="hello"),
+    # path('inserdata/', views.insertdata, name="insertdata"),
+    # path('getdata/', views.getdata, name="getdata"),
 ]
