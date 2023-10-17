@@ -10,8 +10,7 @@ jobs:
     name: SonarCloud
     runs-on: ubuntu-latest
     concurrency:
-      group: sonarcloud
-      cancel-in-progress: true
+      group: SonarcloudAndTesting
     steps:
       - uses: actions/checkout@v3
         with:
