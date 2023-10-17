@@ -1,6 +1,11 @@
 from django.db import models
 
 
+class Study_Area(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+
+
 class User(models.Model):
     id = models.AutoField(primary_key=True)
     id_aws = models.IntegerField()
@@ -9,12 +14,7 @@ class User(models.Model):
     premium = models.BooleanField()
     university = models.CharField(max_length=100)
     karma_score = models.IntegerField()
-    study_areas = models.ManyToManyField('Study_Area', through='User_Study_Area')
-
-
-class Study_Area(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
+    study_areas = models.ManyToManyField(Study_Area)
 
 
 class Resource(models.Model):
@@ -27,7 +27,7 @@ class Resource(models.Model):
     university = models.CharField(max_length=100)
     file_name = models.CharField(max_length=100)
     file_link = models.TextField()
-    study_areas = models.ManyToManyField(Study_Area, through='Resource_Study_Area')
+    study_areas = models.ManyToManyField(Study_Area)
 
     @property
     def total_downloads(self):
