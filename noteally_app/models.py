@@ -15,6 +15,10 @@ class User(models.Model):
     university = models.CharField(max_length=100)
     karma_score = models.IntegerField()
     study_areas = models.ManyToManyField(StudyArea)
+    description = models.TextField()
+    tutoring_services = models.BooleanField()
+    profile_picture_name = models.CharField(max_length=100)
+    profile_picture_link = models.TextField()
 
 
 class Resource(models.Model):
@@ -28,25 +32,16 @@ class Resource(models.Model):
     file_name = models.CharField(max_length=100)
     file_link = models.TextField()
     study_areas = models.ManyToManyField(StudyArea)
-
-    @property
-    def total_downloads(self):
-        return Download.objects.filter(resource=self).count()
-    
-    @property
-    def total_likes(self):
-        return Like.objects.filter(resource=self, like=True).count()
-    
-    @property
-    def total_dislikes(self):
-        return Like.objects.filter(resource=self, like=False).count()
+    total_likes = models.IntegerField(default=0)
+    total_dislikes = models.IntegerField(default=0)
+    total_downloads = models.IntegerField(default=0)
 
 
 class Download(models.Model):
-    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
     download_date = models.DateTimeField()
+    hidden = models.BooleanField(default=False) # If the user has hidden the download
 
 
 class Like(models.Model):
