@@ -6,11 +6,13 @@ from rest_framework import status
 
 from noteally_app.models import Download, Like, Material, StudyArea, User
 
-@api_view(["GET"])
+from django.views.decorators.http import require_http_methods
+
+@require_http_methods(["GET"])
 def hello(request):
     return Response({"message": "Hello, world!"}, status=status.HTTP_200_OK)
 
-@api_view(["POST"])
+@require_http_methods(["POST"])
 def populate_db(request):
     # Insert 5 study areas
     study_area1 = StudyArea(name="Computer Science")
@@ -85,8 +87,3 @@ def populate_db(request):
     like1.save()
     
     return Response({"message": "Database populated successfully!"}, status=status.HTTP_200_OK)
-
-# @api_view(["GET"])
-# def getdata(request):
-#     Professor.objects.all()
-#     return Response({professor.id: professor.name for professor in Professor.objects.all()}, status=status.HTTP_200_OK)

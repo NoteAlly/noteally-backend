@@ -1,6 +1,8 @@
-from .settings import * 
+from .settings import DEBUG, BASE_DIR, DATABASES
 
 DEBUG = True
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 DATABASES = {
     'default': {
