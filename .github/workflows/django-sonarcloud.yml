@@ -13,6 +13,10 @@ jobs:
       group: SonarcloudAndTesting
     steps:
 
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
@@ -33,10 +37,7 @@ jobs:
         with:
           name: coverage-report
           path: coverage.xml  # Adjust the file path to match the location of your coverage report
-          
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
