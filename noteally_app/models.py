@@ -21,16 +21,16 @@ class User(models.Model):
     profile_picture_link = models.TextField()
 
 
-class Resource(models.Model):
+class Material(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.TextField()
     price = models.FloatField(default=0)
-    upload_date = models.DateTimeField()
+    upload_date = models.DateTimeField(auto_now_add=True)
     university = models.CharField(max_length=100)
     file_name = models.CharField(max_length=100)
-    file_link = models.TextField()
+    file = models.FileField(upload_to='materials/')
     study_areas = models.ManyToManyField(StudyArea)
     total_likes = models.IntegerField(default=0)
     total_dislikes = models.IntegerField(default=0)
@@ -39,7 +39,7 @@ class Resource(models.Model):
 
 class Download(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
+    resource = models.ForeignKey(Material, on_delete=models.CASCADE)
     download_date = models.DateTimeField()
     hidden = models.BooleanField(default=False) # If the user has hidden the download
 
@@ -47,5 +47,5 @@ class Download(models.Model):
 class Like(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
+    resource = models.ForeignKey(Material, on_delete=models.CASCADE)
     like = models.BooleanField()

@@ -17,9 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from noteally_app.webservices import ws_materials   # import specific views
+from noteally_app import views  # import generic views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('hello/', views.hello, name="hello"),
-    # path('inserdata/', views.insertdata, name="insertdata"),
-    # path('getdata/', views.getdata, name="getdata"),
+    path('hello/', views.hello, name="hello"),
+    path('populate/', views.populate_db, name="populate"),
 ]
