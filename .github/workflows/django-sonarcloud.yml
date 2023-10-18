@@ -12,9 +12,6 @@ jobs:
     concurrency:
       group: SonarcloudAndTesting
     steps:
-      - name: Create env
-        run: |
-          echo "DJANGO_KEY=${{ secrets.DJANGO_KEY }}" >> .env
       - uses: actions/checkout@v2  # Upgrade to v2
         with:
           fetch-depth: 0
@@ -25,6 +22,9 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
+      - name: Create env
+        run: |
+          echo "DJANGO_KEY=${{ secrets.DJANGO_KEY }}" >> .env
       - name: Run Tests with Coverage
         run: |
           coverage run manage.py test
