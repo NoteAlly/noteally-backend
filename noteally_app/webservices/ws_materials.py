@@ -21,7 +21,7 @@ def post_materials(request):
         object_ = serializer.save()
         return Response({"Success": "Successfully Created", "created_id": object_.id}, status=status.HTTP_201_CREATED)
         
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET', 'POST'])
