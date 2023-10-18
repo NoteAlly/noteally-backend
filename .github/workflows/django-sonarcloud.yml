@@ -29,17 +29,15 @@ jobs:
         run: |
           coverage run manage.py test
           coverage xml -o coverage.xml
-      - name: Install SonarScanner
+      - name: Upload Test Coverage to SonarCloud
         run: |
           sudo apt-get update
           sudo apt-get install -y openjdk-11-jre
           curl -o sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
           unzip sonar-scanner-cli.zip -d /opt
           echo 'export PATH=$PATH:/opt/sonar-scanner-cli-4.6.2.2472-linux/bin' >> $GITHUB_ENV
-        shell: bash
-      - name: Upload Test Coverage to SonarCloud
-        run: |
           sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
