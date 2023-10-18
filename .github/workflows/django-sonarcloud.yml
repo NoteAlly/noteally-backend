@@ -12,12 +12,32 @@ jobs:
     concurrency:
       group: SonarcloudAndTesting
     steps:
-      - name: Create env
-        run: |
-          echo "DJANGO_KEY=${{ secrets.DJANGO_KEY }}" >> .env
+
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Create env
+        run: |
+          echo "DJANGO_KEY=${{ secrets.DJANGO_KEY }}" >> .env
+
+      - name: Run Tests with Code Coverage
+        run: |
+          coverage run manage.py test
+
+      - name: Generate Coverage Report
+        run: |
+          coverage xml -o coverage.xml
+      
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: coverage.xml  # Adjust the file path to match the location of your coverage report
+      
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:

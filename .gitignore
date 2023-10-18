@@ -1,5 +1,7 @@
 noteally_app/migrations/
 materials/
+.coverage
+coverage.xml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
