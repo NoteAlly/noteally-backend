@@ -49,6 +49,7 @@ def populate_db(request):
             profile_picture_name="jane.jpg",
             profile_picture_link="https://noteally.s3.eu-west-3.amazonaws.com/jane.jpg",
         )
+    user2.save()
     
     # Insert 1 materials
     material1 = Material(user=user1,
@@ -59,6 +60,7 @@ def populate_db(request):
             file_name="introduction_to_programming.pdf",
             file="https://noteally.s3.eu-west-3.amazonaws.com/introduction_to_programming.pdf",
         )
+    material1.save()
     
     # Insert 2 Download
     download1 = Download(user=user1,
@@ -81,6 +83,8 @@ def populate_db(request):
             like=True,
         )
     like1.save()
+    
+    return Response({"message": "Database populated successfully!"}, status=status.HTTP_200_OK)
 
 # @api_view(["GET"])
 # def getdata(request):
