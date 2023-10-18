@@ -24,4 +24,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', views.hello, name="hello"),
     path('populate/', views.populate_db, name="populate"),
+    path('materials/', ws_materials.handle, name="materials"),
 ]
