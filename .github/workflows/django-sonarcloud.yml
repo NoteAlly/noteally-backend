@@ -1,4 +1,4 @@
-name: Build and SonarCloud
+name: Build
 on:
   push:
     branches:
@@ -12,38 +12,33 @@ jobs:
     concurrency:
       group: SonarcloudAndTesting
     steps:
-      - uses: actions/checkout@v2  # Upgrade to v2
-        with:
-          fetch-depth: 0
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.x  # Replace with your desired Python version
+
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
       - name: Create env
         run: |
           echo "DJANGO_KEY=${{ secrets.DJANGO_KEY }}" >> .env
-      - name: Run Tests with Coverage
+
+      - name: Run Tests with Code Coverage
         run: |
           coverage run manage.py test
-          coverage xml -o coverage.xml
-      - name: Upload Test Coverage to SonarCloud
+
+      - name: Generate Coverage Report
         run: |
-          sudo apt-get update
-          sudo apt-get install -y openjdk-11-jre
-          curl -o sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
-          unzip sonar-scanner-cli.zip -d /opt
-          echo 'export PATH=$PATH:/opt/sonar-scanner-cli-4.6.2.2472-linux/bin' >> $GITHUB_ENV
-          sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          coverage xml -o coverage.xml
+      
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: coverage.xml  # Adjust the file path to match the location of your coverage report
+          
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
-        with:
-          args: >
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info  # Adjust this path if needed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

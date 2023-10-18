@@ -1,3 +1,6 @@
 [run]
-source = noteally_app
-omit = noteally_app/migrations/*
+omit = */tests/*
+include = noteally_app/*
+
+[report]
+fail_under = 80
