@@ -7,3 +7,6 @@ psycopg2-binary
 
 # load environment variables from .env file
 python-dotenv
+
+# for testing
+mock
