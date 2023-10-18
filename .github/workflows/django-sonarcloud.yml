@@ -1,4 +1,4 @@
-name: Build
+name: Build and SonarCloud
 on:
   push:
     branches:
@@ -15,11 +15,29 @@ jobs:
       - name: Create env
         run: |
           echo "DJANGO_KEY=${{ secrets.DJANGO_KEY }}" >> .env
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2  # Upgrade to v2
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x  # Replace with your desired Python version
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Run Tests with Coverage
+        run: |
+          coverage run manage.py test
+          coverage xml -o coverage.xml
+      - name: Upload Test Coverage to SonarCloud
+        run: |
+          sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info  # Adjust this path if needed

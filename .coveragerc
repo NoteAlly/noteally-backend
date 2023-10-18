@@ -1,0 +1,3 @@
+[run]
+source = noteally_app
+omit = noteally_app/migrations/*

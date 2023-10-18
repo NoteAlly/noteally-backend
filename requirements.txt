@@ -10,3 +10,6 @@ python-dotenv
 
 # for testing
 mock
+
+# for sonarcloud coverage
+coverage
