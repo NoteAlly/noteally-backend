@@ -25,10 +25,10 @@ class TestMaterialsView(APITestCase):
         # form data
         data = {
             "user": self.user1.id,
-            "name": "Introduction to Programming",
-            "description": "Introduction to Programming",
+            "name": "Introduction to Programming1",
+            "description": "Introduction to Programming1",
             "price": 0,
-            "university": "University of Aveiro",
+            "university": "University of Aveiro1",
             "file": file_mock,
             "study_areas": [self.study_area1.id, self.study_area2.id],
         }
@@ -50,10 +50,10 @@ class TestMaterialsView(APITestCase):
         #form data
         data = {
             "user": self.user1.id,
-            "name": "Introduction to Programming",
-            "description": "Introduction to Programming",
+            "name": "Introduction to Programming2",
+            "description": "Introduction to Programming2",
             "price": 0,
-            "university": "University of Aveiro",
+            "university": "University of Aveiro2",
             "file": "string_instead_of_file",
             "study_areas": [self.study_area1.id, self.study_area2.id],
         }
@@ -77,10 +77,10 @@ class TestMaterialsView(APITestCase):
         #form data
         data = {
             "user": self.user1.id,
-            "name": "Introduction to Programming",
-            "description": "Introduction to Programming",
+            "name": "Introduction to Programming3",
+            "description": "Introduction to Programming3",
             "price": 0,
-            "university": "University of Aveiro",
+            "university": "University of Aveiro3",
             "study_areas": [self.study_area1.id, self.study_area2.id],
         }
         
