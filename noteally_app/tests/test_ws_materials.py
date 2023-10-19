@@ -1,23 +1,18 @@
-from rest_framework.test import APIRequestFactory, APITestCase
-
-from unittest import skip, skipIf, skipUnless
-
-# Mocking
+from rest_framework.test import APITestCase
 from unittest import mock
 from django.core.files import File
-
 from django.urls import reverse
-
 from noteally_app.tests.fill_db import fill_db
-
 from rest_framework.exceptions import ErrorDetail
+
 
 class TestMaterialsView(APITestCase):
     
     def setUp(self):
         self = fill_db(self)
         self.url = reverse('materials')
-        
+
+
     def test_post_material_success(self):
         file_mock = mock.MagicMock(spec=File, name="FileMock")
         file_mock.name = 'test.pdf'
@@ -96,3 +91,60 @@ class TestMaterialsView(APITestCase):
         
         # Assert the response data
         self.assertEqual(response.data, expected_response)
+
+
+    def test_get_materials_no_filter(self):
+        response = self.client.get(self.url, format='multipart')
+
+        # Assert the response status code
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response data
+        self.assertEquals(len(response.data), 2)
+
+    
+    def test_get_materials_match(self):
+        data = {
+            "title": "Calculus",
+            "author": "John",
+            "study_area": self.study_area2.id,
+            "university": self.university2.id,
+            "min_likes": 0,
+            "min_downloads": 0,
+            "free": "true",
+            "order_by": "-total_downloads"
+        }
+
+        response = self.client.get(self.url, data, format='multipart')
+
+        # Assert the response status code
+        self.assertEqual(response.status_code, 200)
+
+        # should exist 1 match
+        self.assertEquals(len(response.data), 1)
+
+        # Assert the response data
+        self.assertEquals(response.data[0]['id'], self.material2.id)
+
+
+    def test_get_materials_no_match(self):
+        data = {
+            "title": "Python",
+            "author": "John",
+            "study_area": self.study_area2.id,
+            "university": self.university2.id,
+            "min_likes": 0,
+            "min_downloads": 0,
+            "free": "true",
+            "order_by": "-total_downloads"
+        }
+
+        response = self.client.get(self.url, data, format='multipart')
+
+        # Assert the response status code
+        self.assertEqual(response.status_code, 200)
+
+        # should exist 0 match
+        self.assertEquals(len(response.data), 0)
+
+
