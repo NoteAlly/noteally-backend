@@ -28,7 +28,7 @@ class TestMaterialsView(APITestCase):
             "name": "Introduction to Programming1",
             "description": "Introduction to Programming1",
             "price": 0,
-            "university": "University of Aveiro1",
+            "university": self.university1.id,
             "file": file_mock,
             "study_areas": [self.study_area1.id, self.study_area2.id],
         }
@@ -53,7 +53,7 @@ class TestMaterialsView(APITestCase):
             "name": "Introduction to Programming2",
             "description": "Introduction to Programming2",
             "price": 0,
-            "university": "University of Aveiro2",
+            "university": self.university1.id,
             "file": "string_instead_of_file",
             "study_areas": [self.study_area1.id, self.study_area2.id],
         }
@@ -80,7 +80,7 @@ class TestMaterialsView(APITestCase):
             "name": "Introduction to Programming3",
             "description": "Introduction to Programming3",
             "price": 0,
-            "university": "University of Aveiro3",
+            "university": self.university1.id,
             "study_areas": [self.study_area1.id, self.study_area2.id],
         }
         
@@ -96,7 +96,3 @@ class TestMaterialsView(APITestCase):
         
         # Assert the response data
         self.assertEqual(response.data, expected_response)
-        
-        
-        
-        

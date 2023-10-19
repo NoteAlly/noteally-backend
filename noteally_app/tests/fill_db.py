@@ -1,4 +1,4 @@
-from noteally_app.models import Download, Like, Material, StudyArea, User
+from noteally_app.models import Download, Like, Material, StudyArea, User, University
 
 def fill_db(self):
     # Insert 5 study areas
@@ -7,13 +7,17 @@ def fill_db(self):
     self.study_area3 = StudyArea.objects.create(name="Physics")
     self.study_area4 = StudyArea.objects.create(name="Chemistry")
     self.study_area5 = StudyArea.objects.create(name="Biology")
+
+    # Insert 2 Universities
+    self.university1 = University.objects.create(name="University of Aveiro")
+    self.university2 = University.objects.create(name="University of Lisboa")
     
     # Insert 2 users
     self.user1 = User.objects.create(id_aws=1,
             name="John",
             email="john@ua.pt",
             premium=True,
-            university="University of Lisboa",
+            university=self.university1,
             karma_score=0,
             description="I'm a student at the University of Aveiro.",
             tutoring_services=True,
@@ -25,7 +29,7 @@ def fill_db(self):
             name="Jane",
             email="jane@ua.pt",
             premium=False,
-            university="University of Aveiro",
+            university=self.university2,
             karma_score=0,
             description="I'm a student at the University of Aveiro.",
             tutoring_services=False,
@@ -38,7 +42,7 @@ def fill_db(self):
             name="Introduction to Programming",
             description="Introduction to Programming",
             price=0,
-            university="University of Aveiro",
+            university=self.university1,
             file_name="introduction_to_programming.pdf",
             file="https://noteally.s3.eu-west-3.amazonaws.com/introduction_to_programming.pdf",
         )
