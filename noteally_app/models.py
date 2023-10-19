@@ -6,13 +6,18 @@ class StudyArea(models.Model):
     name = models.CharField(max_length=100)
 
 
+class University(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+
+
 class User(models.Model):
     id = models.AutoField(primary_key=True)
     id_aws = models.IntegerField()
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
     premium = models.BooleanField()
-    university = models.CharField(max_length=100)
+    university = models.ForeignKey(University, on_delete=models.DO_NOTHING)
     karma_score = models.IntegerField()
     study_areas = models.ManyToManyField(StudyArea)
     description = models.TextField()
@@ -28,7 +33,7 @@ class Material(models.Model):
     description = models.TextField()
     price = models.FloatField(default=0)
     upload_date = models.DateTimeField(auto_now_add=True)
-    university = models.CharField(max_length=100)
+    university = models.ForeignKey(University, on_delete=models.DO_NOTHING)
     file_name = models.CharField(max_length=100, blank=True)
     file = models.FileField(upload_to='materials/', blank=True)
     study_areas = models.ManyToManyField(StudyArea)
