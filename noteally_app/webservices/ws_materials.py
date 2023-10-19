@@ -37,13 +37,16 @@ def get_materials(request):
     if "university" in request.GET:
         materials = materials.filter(university__id=request.GET["university"])
     if "min_likes" in request.GET:
-        materials = materials.filter(likes__gte=request.GET["min_likes"])
+        materials = materials.filter(total_likes__gte=request.GET["min_likes"])
     if "min_downloads" in request.GET:
-        materials = materials.filter(downloads__gte=request.GET["min_downloads"])
+        materials = materials.filter(total_downloads__gte=request.GET["min_downloads"])
     if "free" in request.GET:
         if request.GET["free"] == "true":
             materials = materials.filter(price=0)
-        elif "max_price" in request.GET:
+        else:
+            materials = materials.filter(price__gt=0)
+        
+        if "max_price" in request.GET:
             materials = materials.filter(price__lte=request.GET["max_price"])
     
     # ordering
