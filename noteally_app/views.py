@@ -4,15 +4,15 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 
-from noteally_app.models import Download, Like, Material, StudyArea, User
+from noteally_app.models import Download, Like, Material, StudyArea, User, University
 
 from django.views.decorators.http import require_http_methods
 
-@require_http_methods(["GET"])
+@api_view(["GET"])
 def hello(request):
     return Response({"message": "Hello, world!"}, status=status.HTTP_200_OK)
 
-@require_http_methods(["POST"])
+@api_view(["POST"])
 def populate_db(request):
     # Insert 5 study areas
     study_area1 = StudyArea(name="Computer Science")
@@ -25,13 +25,19 @@ def populate_db(request):
     study_area4.save()
     study_area5 = StudyArea(name="Biology")
     study_area5.save()
+
+    # Insert 2 universities
+    university1 = University(name="University of Aveiro")
+    university1.save()
+    university2 = University(name="University of Porto")
+    university2.save()
     
     # Insert 2 users
     user1 = User(id_aws=1,
             name="John",
             email="john@ua.pt",
             premium=True,
-            university="University of Aveiro",
+            university=university1,
             karma_score=0,
             description="I'm a student at the University of Aveiro.",
             tutoring_services=True,
@@ -44,7 +50,7 @@ def populate_db(request):
             name="Jane",
             email="jane@ua.pt",
             premium=False,
-            university="University of Aveiro",
+            university=university2,
             karma_score=0,
             description="I'm a student at the University of Aveiro.",
             tutoring_services=False,
@@ -58,7 +64,7 @@ def populate_db(request):
             name="Introduction to Programming",
             description="Introduction to Programming",
             price=0,
-            university="University of Aveiro",
+            university=university1,
             file_name="introduction_to_programming.pdf",
             file="https://noteally.s3.eu-west-3.amazonaws.com/introduction_to_programming.pdf",
         )
