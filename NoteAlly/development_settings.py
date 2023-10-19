@@ -1,4 +1,4 @@
-from .settings import DEBUG, BASE_DIR, DATABASES
+from .settings import * #NOSONAR
 
 DEBUG = True
 

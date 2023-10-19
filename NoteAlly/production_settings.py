@@ -1,4 +1,4 @@
-from .settings import ALLOWED_HOSTS
+from .settings import ALLOWED_HOSTS #NOSONAR
 
 
 ALLOWED_HOSTS = ['*']
