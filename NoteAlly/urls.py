@@ -17,12 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from noteally_app.webservices import ws_materials   # import specific views
+from noteally_app.webservices import ws_info, ws_materials, ws_test   # import specific views
 from noteally_app import views  # import generic views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('hello/', views.hello, name="hello"),
-    path('populate/', views.populate_db, name="populate"),
+    path('info/', ws_info.handle, name="info"),
+    path('populate/', ws_test.populate_db, name="populate"),
     path('materials/', ws_materials.handle, name="materials"),
 ]
