@@ -38,6 +38,7 @@ def populate_db(request):
             profile_picture_link="https://noteally.s3.eu-west-3.amazonaws.com/john.jpg",
         )
     user1.save()
+    user1.study_areas.add(study_area1)
     
     user2 = User(id_aws=2,
             name="Jane",
@@ -51,6 +52,7 @@ def populate_db(request):
             profile_picture_link="https://noteally.s3.eu-west-3.amazonaws.com/jane.jpg",
         )
     user2.save()
+    user2.study_areas.add(study_area2)
     
     # Insert 1 materials
     material1 = Material(user=user1,

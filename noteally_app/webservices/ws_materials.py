@@ -24,8 +24,8 @@ def get_materials(request):
     materials = Material.objects.all()
 
     # filtering
-    if "title" in request.GET:
-        materials = materials.filter(name__icontains=request.GET["title"])
+    if "name" in request.GET:
+        materials = materials.filter(name__icontains=request.GET["name"])
     if "author" in request.GET:
         materials = materials.filter(user__name__icontains=request.GET["author"])
     if "study_area" in request.GET:
@@ -46,7 +46,7 @@ def get_materials(request):
             materials = materials.filter(price__lte=request.GET["max_price"])
     
     # ordering
-    order_options = ["name", "price", "-price", "total_downloads", "-total_downloads", "total_likes", "-total_likes"]
+    order_options = ["name", "-name", "price", "-price", "total_downloads", "-total_downloads", "total_likes", "-total_likes", "upload_date", "-upload_date"]
 
     if "order_by" in request.GET and request.GET["order_by"] in order_options:
         materials = materials.order_by(request.GET["order_by"])
