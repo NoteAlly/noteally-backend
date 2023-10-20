@@ -100,7 +100,7 @@ class TestMaterialsView(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         # Assert the response data
-        self.assertEquals(len(response.data), 2)
+        self.assertEquals(len(response.data['results']), 2)
 
     
     def test_get_materials_match(self):
@@ -121,22 +121,16 @@ class TestMaterialsView(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         # should exist 1 match
-        self.assertEquals(len(response.data), 1)
+        self.assertEquals(len(response.data['results']), 1)
 
         # Assert the response data
-        self.assertEquals(response.data[0]['id'], self.material2.id)
+        self.assertEquals(response.data['results'][0]['id'], self.material2.id)
 
 
     def test_get_materials_no_match(self):
         data = {
-            "title": "Python",
-            "author": "John",
-            "study_area": self.study_area2.id,
-            "university": self.university2.id,
-            "min_likes": 0,
-            "min_downloads": 0,
-            "free": "true",
-            "order_by": "-total_downloads"
+            "free": "false",
+            "max_price": 5
         }
 
         response = self.client.get(self.url, data, format='multipart')
@@ -145,6 +139,4 @@ class TestMaterialsView(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         # should exist 0 match
-        self.assertEquals(len(response.data), 0)
-
-
+        self.assertEquals(len(response.data['results']), 0)

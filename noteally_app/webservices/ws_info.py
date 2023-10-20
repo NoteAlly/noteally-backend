@@ -10,7 +10,7 @@ from noteally_app.serializers import InfoSerializer
 from noteally_app.models import University, StudyArea
 
 
-def get_info(request):
+def get_info():
     universities = University.objects.all()
     study_areas = StudyArea.objects.all()
     serializer = InfoSerializer({"universities": universities, "study_areas": study_areas})
@@ -22,7 +22,7 @@ def get_info(request):
 def handle(request):
     try:
         if request.method == 'GET':
-            return get_info(request)
+            return get_info()
         
     except Exception as e:
        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
