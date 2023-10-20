@@ -48,7 +48,7 @@ class MaterialSerializer(serializers.ModelSerializer):
         class Meta:
             model = Material
             fields = '__all__'
-            depth = 1
+            depth = 2
             
             
 class PostMaterialSerializer(serializers.ModelSerializer):
