@@ -12,13 +12,13 @@ from rest_framework.authtoken.models import Token
 def login_(request):
     '''Login a user''' 
     if 'email' not in request.data or 'password' not in request.data:
-            return Response({'msg': 'Credentials missing'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Credentials missing'}, status=status.HTTP_400_BAD_REQUEST)
     email = request.POST['email']
     password = request.POST['password'] 
     if (User.objects.filter(email=email).exists() and User.objects.get(email=email).check_password(password)):  
             user = User.objects.get(email=email)  
-            return Response({'msg': 'Login Success','user': user.id}, status=status.HTTP_200_OK)
-    return Response({'msg': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"Success": "Successfully Created",'user': user.id}, status=status.HTTP_200_OK)
+    return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
  
 
 
@@ -34,9 +34,9 @@ def register(request):
             return Response({'message': 'Email already in use!'}, status=status.HTTP_400_BAD_REQUEST)
         
         serializer.save()  
-        return Response({'msg': 'Register Success'},
+        return Response({"Success": "Successfully Created"},
                          status=status.HTTP_200_OK)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"error":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
