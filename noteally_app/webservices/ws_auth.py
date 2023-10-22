@@ -6,21 +6,7 @@ from noteally_app.models import Download, Like, Material, StudyArea, User, Unive
 from noteally_app.serializers import RegisterSerializer, LoginSerializer
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login, logout  
-#from rest_framework_simplejwt.tokens import RefreshToken
-
-
-
-# @api_view(['POST'])
-# @permission_classes([AllowAny])
-# def register(request):
-#     '''Register a new user'''
-#     serializer = RegisterSerializer(data=request.data)
-#     if serializer.is_valid():
-#         user = serializer.save()
-#         return Response({'token': AuthToken.objects.create(user)[1]},
-#                         status=status.HTTP_201_CREATED)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+from rest_framework.authtoken.models import Token 
 
 @api_view(['POST']) 
 def login_(request):
@@ -28,12 +14,10 @@ def login_(request):
     if 'email' not in request.data or 'password' not in request.data:
             return Response({'msg': 'Credentials missing'}, status=status.HTTP_400_BAD_REQUEST)
     email = request.POST['email']
-    password = request.POST['password']
-    user = authenticate(request, email=email, password=password)
-    if user is not None:
-        login(request, user)
-        #auth_data = get_tokens_for_user(request.user)
-        return Response({'msg': 'Login Success'}, status=status.HTTP_200_OK)
+    password = request.POST['password'] 
+    if (User.objects.filter(email=email).exists() and User.objects.get(email=email).check_password(password)):  
+            user = User.objects.get(email=email)  
+            return Response({'msg': 'Login Success','user': user.id}, status=status.HTTP_200_OK)
     return Response({'msg': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
  
 
@@ -49,7 +33,7 @@ def register(request):
         if User.objects.filter(email=data_['email']).exists():
             return Response({'message': 'Email already in use!'}, status=status.HTTP_400_BAD_REQUEST)
         
-        serializer.save() 
+        serializer.save()  
         return Response({'msg': 'Register Success'},
                          status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
