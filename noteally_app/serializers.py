@@ -86,7 +86,7 @@ class RegisterSerializer(serializers.ModelSerializer):
    
     class Meta:
         model = User
-        fields = ('id', 'password', 'id_aws', 'name', 'email', 'university', 'description', 'tutoring_services', 'profile_picture_name')
+        fields = ('id', 'password', 'id_aws', 'name', 'email', 'university', 'description', 'tutoring_services')
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -100,7 +100,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             karma_score=0,
             description=self.validated_data['description'],
             tutoring_services=self.validated_data['tutoring_services'],
-            profile_picture_name=self.validated_data['profile_picture_name'],
+            profile_picture_name="",
             profile_picture_link="") 
         password = self.validated_data['password']
         user.set_password(password)
