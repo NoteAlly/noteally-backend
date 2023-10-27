@@ -27,4 +27,5 @@ urlpatterns = [
     path('materials/', ws_materials.handle, name="materials"),
     path('register/', ws_auth.register, name="register"),
     path('login/', ws_auth.login_, name="login"),
+    path('materials/<int:material_id>/', ws_materials.handle_id, name="materials_id"),
 ]

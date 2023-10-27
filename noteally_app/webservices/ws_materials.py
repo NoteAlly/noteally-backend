@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from noteally_app.CustomPagination import CustomPagination
-from noteally_app.serializers import PostMaterialSerializer, MaterialSerializer
+from noteally_app.serializers import MaterialIDSerializer, PostMaterialSerializer, MaterialSerializer
 from noteally_app.models import Material
 
 
@@ -61,6 +61,16 @@ def get_materials(request):
     return Response(paginated_response.data, status=status.HTTP_200_OK)
 
 
+def get_materials_id(material_id):
+    try:
+        material = Material.objects.get(id=material_id)
+    except Material.DoesNotExist:
+        return Response({'error': 'Material does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = MaterialIDSerializer(material)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 @api_view(['GET', 'POST'])
 def handle(request):
     try:
@@ -69,5 +79,14 @@ def handle(request):
         elif request.method == 'GET':
             return get_materials(request)
 
+    except Exception as e:
+       return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+   
+   
+@api_view(['GET', 'PUT', 'DELETE'])
+def handle_id(request, material_id):
+    try:
+        if request.method == 'GET':
+            return get_materials_id(material_id)
     except Exception as e:
        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
