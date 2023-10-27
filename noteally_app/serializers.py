@@ -9,6 +9,14 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__' 
+
+
+class UserMaterialIDSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = ('id', 'name', 'email', 'karma_score', 'description', 'tutoring_services', 'profile_picture_link', 'university', 'study_areas')
+        depth = 1
         
 
 # ------------------------------ StudyArea Serializers ------------------------------
@@ -35,7 +43,7 @@ class UniversitySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class UniversitySerializer(serializers.ModelSerializer):
+class UniversityValueSerializer(serializers.ModelSerializer):
     value = serializers.IntegerField(source='id')
     
     class Meta:
@@ -57,6 +65,23 @@ class PostMaterialSerializer(serializers.ModelSerializer):
         class Meta:
             model = Material
             fields = ('user', 'name', 'description', 'price', 'university', 'file_name', 'file', 'study_areas')
+
+
+class MaterialIDSerializer(serializers.ModelSerializer):
+    upload_date = serializers.SerializerMethodField()
+    user = UserMaterialIDSerializer()
+    
+    #format date
+    def get_upload_date(self, obj):
+        if obj.upload_date == None:
+            return None
+        return obj.upload_date.strftime("%d/%m/%Y %H:%M:%S")
+        
+    class Meta:
+        model = Material
+        fields = '__all__'
+        fields = ('id', 'upload_date', 'name', 'description', 'price', 'file_name', 'file', 'total_likes', 'total_dislikes', 'total_downloads', 'user', 'university', 'study_areas')
+        depth = 1
             
             
 # ------------------------------ Download Serializers ------------------------------
@@ -77,7 +102,7 @@ class LikeSerializer(serializers.ModelSerializer):
             
 # ------------------------------ Info Serializers ------------------------------
 class InfoSerializer(serializers.Serializer):
-    universities = UniversitySerializer(many=True)
+    universities = UniversityValueSerializer(many=True)
     study_areas = ValueStudyAreaSerializer(many=True)
     
 # ------------------------------ Auth Serializers ------------------------------
