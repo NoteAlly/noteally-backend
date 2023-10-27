@@ -61,7 +61,7 @@ def get_materials(request):
     return Response(paginated_response.data, status=status.HTTP_200_OK)
 
 
-def get_materials_id(request, material_id):
+def get_materials_id(material_id):
     try:
         material = Material.objects.get(id=material_id)
     except Material.DoesNotExist:
@@ -87,6 +87,6 @@ def handle(request):
 def handle_id(request, material_id):
     try:
         if request.method == 'GET':
-            return get_materials_id(request, material_id)
+            return get_materials_id(material_id)
     except Exception as e:
        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
