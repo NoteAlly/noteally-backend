@@ -56,7 +56,7 @@ class MaterialSerializer(serializers.ModelSerializer):
         
         class Meta:
             model = Material
-            fields = '__all__'
+            exclude = ['file']
             depth = 2
             
             
@@ -64,7 +64,7 @@ class PostMaterialSerializer(serializers.ModelSerializer):
         
         class Meta:
             model = Material
-            fields = ('user', 'name', 'description', 'price', 'university', 'file_name', 'file', 'study_areas')
+            fields = ('user', 'name', 'description', 'price', 'university', 'file_name', 'file_size', 'file', 'study_areas')
 
 
 class MaterialIDSerializer(serializers.ModelSerializer):
@@ -80,7 +80,7 @@ class MaterialIDSerializer(serializers.ModelSerializer):
     class Meta:
         model = Material
         fields = '__all__'
-        fields = ('id', 'upload_date', 'name', 'description', 'price', 'file_name', 'file', 'total_likes', 'total_dislikes', 'total_downloads', 'user', 'university', 'study_areas')
+        fields = ('id', 'upload_date', 'name', 'description', 'price', 'file_name', 'file_size', 'total_likes', 'total_dislikes', 'total_downloads', 'user', 'university', 'study_areas')
         depth = 1
             
             

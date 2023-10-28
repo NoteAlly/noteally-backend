@@ -102,6 +102,7 @@ class Material(models.Model):
     upload_date = models.DateTimeField(auto_now_add=True)
     university = models.ForeignKey(University, on_delete=models.DO_NOTHING)
     file_name = models.CharField(max_length=100, blank=True)
+    file_size = models.IntegerField(default=0)
     file = models.FileField(upload_to='materials/', blank=True)
     study_areas = models.ManyToManyField(StudyArea)
     total_likes = models.IntegerField(default=0)
