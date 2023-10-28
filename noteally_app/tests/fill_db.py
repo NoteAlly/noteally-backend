@@ -45,7 +45,8 @@ def fill_db(self):
         price=0,
         university=self.university1,
         file_name="introduction_to_programming.pdf",
-        file="https://noteally.s3.eu-west-3.amazonaws.com/introduction_to_programming.pdf",
+        file_size=1000,
+        file="introduction_to_programming.pdf",
     )
     self.material1.study_areas.add(self.study_area1)
     
@@ -56,8 +57,6 @@ def fill_db(self):
         description="Introduction to Integrals",
         price=0,
         university=self.university2,
-        file_name="introduction_to_programming.pdf",
-        file="https://noteally.s3.eu-west-3.amazonaws.com/introduction_to_programming.pdf",
     )
     self.material2.study_areas.add(self.study_area2)
 

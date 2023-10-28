@@ -1,4 +1,4 @@
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, override_settings
 from unittest import mock
 from django.core.files import File
 from django.urls import reverse
@@ -6,6 +6,7 @@ from noteally_app.models import Material
 from django.db.models import Max
 from noteally_app.tests.fill_db import fill_db
 from rest_framework.exceptions import ErrorDetail
+import shutil
 
 
 class TestMaterialsView(APITestCase):
@@ -13,6 +14,10 @@ class TestMaterialsView(APITestCase):
     def setUp(self):
         self = fill_db(self)
         self.url = reverse('materials')
+
+
+    def tearDown(self):
+        shutil.rmtree('test_media', ignore_errors=True)
 
 
     def test_post_material_success(self):
@@ -161,11 +166,10 @@ class TestMaterialsIDView(APITestCase):
             'description': 'Introduction to Programming',
             'price': 0,
             'file_name': 'introduction_to_programming.pdf',
-            'file': '/https%3A/noteally.s3.eu-west-3.amazonaws.com/introduction_to_programming.pdf',
+            'file_size': 1000,
             'total_likes': 0,
             'total_dislikes': 0,
             'total_downloads': 0,
-            # user : ('id', 'name', 'email', 'karma_score', 'description', 'tutoring_services', 'profile_picture_link', 'university', 'study_areas')
             'user': {
                 'id': self.user1.id,
                 'name': 'John',
@@ -216,4 +220,46 @@ class TestMaterialsIDView(APITestCase):
         
         # Assert the response data
         self.assertEqual(response.data, expected_response)
+
+
+    def test_get_material_link_with_file(self):
+
+        url = reverse('materials_id_download', kwargs={'material_id': self.material1.id})
+        response = self.client.get(url)
         
+        expected_response = {
+            'name': self.material1.file_name,
+            'link': '/test_media/' + self.material1.file_name,
+        }
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, expected_response)
+    
+
+    def test_get_material_link_with_no_file(self):
+
+        url = reverse('materials_id_download', kwargs={'material_id': self.material2.id})
+        response = self.client.get(url)
+        
+        expected_response = {
+            'error': 'Material does not have a file'
+        }
+        
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, expected_response)
+
+
+    def test_get_material_link_invalid_id(self):
+        max_id = Material.objects.aggregate(max_id=Max('id'))['max_id']
+        non_existent_id = max_id + 1 if max_id is not None else 1
+        
+        url = reverse('materials_id_download', kwargs={'material_id': non_existent_id})
+        response = self.client.get(url)
+        
+        expected_response = {
+            'error': 'Material does not exist'
+        }
+        
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, expected_response)
+    
