@@ -32,4 +32,4 @@ jobs:
         echo "DJANGO_KEY=${{ secrets.DJANGO_KEY }}" >> .env
     - name: Run Tests
       run: |
-        python manage.py test --noinput
+        python manage.py test --settings=NoteAlly.test_settings --noinput 
