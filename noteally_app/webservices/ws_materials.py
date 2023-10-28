@@ -4,16 +4,21 @@ from rest_framework.response import Response
 from noteally_app.CustomPagination import CustomPagination
 from noteally_app.serializers import MaterialIDSerializer, PostMaterialSerializer, MaterialSerializer
 from noteally_app.models import Material
+import uuid
 
 
 def post_materials(request):
     data_ = request.data.copy()
+
     if 'file' in request.FILES:
         data_['file_name'] = request.FILES['file'].name
+        data_['file_size'] = request.FILES['file'].size
     
     serializer = PostMaterialSerializer(data=data_)
     
     if serializer.is_valid():
+        if 'file' in request.FILES:
+            serializer.validated_data['file'].name = str(uuid.uuid4()) + '.' + data_['file_name'].split('.')[-1]
         object_ = serializer.save()
         return Response({"Success": "Successfully Created", "created_id": object_.id}, status=status.HTTP_201_CREATED)
         
@@ -71,6 +76,18 @@ def get_materials_id(material_id):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+def get_materials_id_download(material_id):
+    try:
+        material = Material.objects.get(id=material_id)
+    except Material.DoesNotExist:
+        return Response({'error': 'Material does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if not material.file:
+        return Response({'error': 'Material does not have a file'}, status=status.HTTP_404_NOT_FOUND)
+    
+    return Response({"name": material.file_name, "link": material.file.url}, status=status.HTTP_200_OK)
+
+
 @api_view(['GET', 'POST'])
 def handle(request):
     try:
@@ -87,6 +104,8 @@ def handle(request):
 def handle_id(request, material_id):
     try:
         if request.method == 'GET':
+            if "download" in request.path:
+                return get_materials_id_download(material_id)
             return get_materials_id(material_id)
     except Exception as e:
        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

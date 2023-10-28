@@ -59,9 +59,7 @@ def populate_db(request):
             name="Introduction to Programming",
             description="Introduction to Programming",
             price=0,
-            university=university1,
-            file_name="introduction_to_programming.pdf",
-            file="https://noteally.s3.eu-west-3.amazonaws.com/introduction_to_programming.pdf",
+            university=university1
         )
     material1.save()
     
