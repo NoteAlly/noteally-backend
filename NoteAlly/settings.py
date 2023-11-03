@@ -31,9 +31,9 @@ DEBUG = False
 
 ALLOWED_HOSTS = []
 
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:3030',
-# ]
+CORS_ALLOW_HEADERS = [
+    "user_id"
+]
 
 
 # Application definition
@@ -184,6 +184,10 @@ STORAGES = {
         },
     },
 }
+
+
+# AMAZON COGNITO SETTINGS
+COGNITO_DOMAIN = os.environ.get('AWS_COGNITO_DOMAIN')
 
 
 # Default primary key field type

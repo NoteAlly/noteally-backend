@@ -1,52 +1,74 @@
-
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework import status
-from noteally_app.models import Download, Like, Material, StudyArea, User, University
-from noteally_app.serializers import RegisterSerializer, LoginSerializer
-from rest_framework.authtoken.models import Token
-from django.contrib.auth import authenticate, login, logout   
+from django.conf import settings
+from noteally_app.models import User
+from noteally_app.serializers import UserSessionSerializer
+import requests
 
-@api_view(['POST']) 
-def login_(request):
-    '''Login a user''' 
+
+def get_cognito_user(access_token):
+    # NOSONAR
+    cognito_domain = settings.COGNITO_DOMAIN
+    url = f'https://{cognito_domain}/oauth2/userInfo'
+    headers = {'Authorization': f'Bearer {access_token}'}
+
+    response = requests.get(url, headers=headers)
+    response_data = response.json()
+
+    if response.status_code == 200:
+        cognito_user = {
+            'sub': response_data['sub'],
+            'email_verified': response_data['email_verified'],
+            'first_name': response_data['given_name'],
+            'last_name': response_data['family_name'],
+            'email': response_data['email'],
+            'username': response_data['username']
+        }
+        return cognito_user
+    return None
+
+
+def authenticate(request):
+    auth_data = request.data
+    access_token = auth_data['access_token']
+    id_token = auth_data['id_token']
+    cognito_user = get_cognito_user(access_token)
+
+    if cognito_user is None:
+        return Response({'error': 'Invalid access token or user does not exist'}, status=400)
     
-    print(request.data['email'])
-    if 'email' not in request.data or 'password' not in request.data:
-            return Response({'error': 'Credentials missing'}, status=status.HTTP_400_BAD_REQUEST)
-    email = request.data['email']
-    password = request.data['password']
-    if (User.objects.filter(email=email).exists() ):  
-        if (User.objects.get(email=email).check_password(password)):
-            user = User.objects.get(email=email)  
-            return Response({"Success": "Successfully Logged",'id': user.id,'name': user.name, 'email': user.email}, status=status.HTTP_200_OK)
-       
-    return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
- 
+    user_in_db = User.objects.filter(sub=cognito_user['sub']).count() == 1
+    registered = True
+
+    if not user_in_db:
+        registered = False
+        user = User(
+            sub=cognito_user['sub'],
+            first_name=cognito_user['first_name'],
+            last_name=cognito_user['last_name'],
+            email=cognito_user['email'],
+        )
+        user.save()
+
+    user = User.objects.get(sub=cognito_user['sub'])
+    user_data = {
+        'id': user.id,
+        'sub': user.sub,
+        'id_token': id_token,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'email': user.email,
+        'premium': user.premium,
+        'karma_score': user.karma_score,
+        'tutoring_services': user.tutoring_services,
+        'profile_picture': user.profile_picture,
+        'registered': registered
+    }
+    session_serializer = UserSessionSerializer(user_data)
+    return Response(session_serializer.data, status=200)
 
 
 @api_view(['POST'])
-def register(request):  
-    data_ = request.data.copy() 
-
-    serializer = RegisterSerializer(data=request.data)
-   
-    if serializer.is_valid():    
-        
-        if User.objects.filter(email=data_['email']).exists():
-            return Response({'message': 'Email already in use!'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer.save()  
-        return Response({"Success": "Successfully Registered"},
-                         status=status.HTTP_200_OK)
-    return Response({"error":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
-def get_tokens_for_user(user):
-    refresh = RefreshToken.for_user(user)
-
-    return {
-        'refresh': str(refresh),
-        'access': str(refresh.access_token),
-    }
-     
-     
+def handle(request):
+    if request.method == 'POST':
+        return authenticate(request)

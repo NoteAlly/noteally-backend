@@ -13,28 +13,30 @@ def fill_db(self):
     self.university2 = University.objects.create(name="University of Lisboa")
     
     # Insert 2 users
-    self.user1 = User.objects.create(id_aws=1,
-        name="John",
+    self.user1 = User.objects.create(
+        sub="123456789",
+        first_name="John",
+        last_name="Doe",
         email="john@ua.pt",
         premium=True,
-        university=self.university1,
         karma_score=0,
         description="I'm a student at the University of Aveiro.",
         tutoring_services=True,
         profile_picture_name="john.jpg",
-        profile_picture_link="https://noteally.s3.eu-west-3.amazonaws.com/john.jpg",
+        profile_picture="https://noteally.s3.eu-west-3.amazonaws.com/john.jpg",
     )
     
-    self.user2 = User.objects.create(id_aws=2,
-        name="Jane",
+    self.user2 = User.objects.create(
+        sub="987654321",
+        first_name="Jane",
+        last_name="Doe",
         email="jane@ua.pt",
         premium=False,
-        university=self.university2,
         karma_score=0,
         description="I'm a student at the University of Aveiro.",
         tutoring_services=False,
         profile_picture_name="jane.jpg",
-        profile_picture_link="https://noteally.s3.eu-west-3.amazonaws.com/jane.jpg",
+        profile_picture="https://noteally.s3.eu-west-3.amazonaws.com/jane.jpg",
     )
 
     # Insert 2 materials

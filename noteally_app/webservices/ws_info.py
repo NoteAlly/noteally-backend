@@ -20,9 +20,5 @@ def get_info():
 
 @api_view(['GET'])
 def handle(request):
-    try:
-        if request.method == 'GET':
-            return get_info()
-        
-    except Exception as e:
-       return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'GET':
+        return get_info()

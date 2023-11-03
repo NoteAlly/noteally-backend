@@ -6,3 +6,4 @@ python-dotenv
 mock
 coverage
 django-storages[s3]
+requests

@@ -25,8 +25,7 @@ urlpatterns = [
     path('info/', ws_info.handle, name="info"),
     path('populate/', ws_test.populate_db, name="populate"),
     path('materials/', ws_materials.handle, name="materials"),
-    path('register/', ws_auth.register, name="register"),
-    path('login/', ws_auth.login_, name="login"),
+    path('login/', ws_auth.handle, name="login"),
     path('materials/<int:material_id>/', ws_materials.handle_id, name="materials_id"),
     path('materials/<int:material_id>/download', ws_materials.handle_id, name="materials_id_download"),
 ]

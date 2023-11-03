@@ -26,31 +26,25 @@ def populate_db(request):
     university2.save()
     
     # Insert 2 users
-    user1 = User(id_aws=1,
-            name="John",
-            email="john@ua.pt",
-            premium=True,
-            university=university1,
-            karma_score=0,
-            description="I'm a student at the University of Aveiro.",
-            tutoring_services=True,
-            profile_picture_name="john.jpg",
-            profile_picture_link="https://noteally.s3.eu-west-3.amazonaws.com/john.jpg",
-        )
+    user1 = User(
+        sub="123456789",
+        first_name="John",
+        last_name="Doe",
+        email="john@ua.pt",
+        karma_score=0,
+        description="I'm a student at the University of Aveiro."
+    )
     user1.save()
     user1.study_areas.add(study_area1)
     
-    user2 = User(id_aws=2,
-            name="Jane",
-            email="jane@ua.pt",
-            premium=False,
-            university=university2,
-            karma_score=0,
-            description="I'm a student at the University of Aveiro.",
-            tutoring_services=False,
-            profile_picture_name="jane.jpg",
-            profile_picture_link="https://noteally.s3.eu-west-3.amazonaws.com/jane.jpg",
-        )
+    user2 = User(
+        sub="987654321",
+        first_name="Jane",
+        last_name="Doe",
+        email="jane@ua.pt",
+        karma_score=0,
+        description="I'm a student at the University of Aveiro.",
+    )
     user2.save()
     user2.study_areas.add(study_area2)
     

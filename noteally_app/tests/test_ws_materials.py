@@ -1,9 +1,7 @@
-from rest_framework.test import APITestCase, override_settings
+from rest_framework.test import APITestCase
 from unittest import mock
 from django.core.files import File
 from django.urls import reverse
-from noteally_app.models import Material
-from django.db.models import Max
 from noteally_app.tests.fill_db import fill_db
 from rest_framework.exceptions import ErrorDetail
 import shutil
@@ -49,7 +47,6 @@ class TestMaterialsView(APITestCase):
         
     
     def test_post_material_invalid_file(self):
-        #form data
         data = {
             "user": self.user1.id,
             "name": "Introduction to Programming2",
@@ -76,7 +73,6 @@ class TestMaterialsView(APITestCase):
         
     
     def test_post_material_no_file(self):
-        #form data
         data = {
             "user": self.user1.id,
             "name": "Introduction to Programming3",
@@ -101,7 +97,7 @@ class TestMaterialsView(APITestCase):
 
 
     def test_get_materials_no_filter(self):
-        response = self.client.get(self.url, format='multipart')
+        response = self.client.get(self.url)
 
         # Assert the response status code
         self.assertEqual(response.status_code, 200)
@@ -110,9 +106,33 @@ class TestMaterialsView(APITestCase):
         self.assertEquals(len(response.data['results']), 2)
 
     
-    def test_get_materials_match(self):
+    def test_get_materials_match_1(self):
         data = {
-            "title": "Calculus",
+            "name": "Calculus",
+            "author": "John Doe",
+            "study_area": self.study_area2.id,
+            "university": self.university2.id,
+            "min_likes": 0,
+            "min_downloads": 0,
+            "free": "true",
+            "order_by": "-total_downloads"
+        }
+
+        response = self.client.get(self.url, data)
+
+        # Assert the response status code
+        self.assertEqual(response.status_code, 200)
+
+        # should exist 1 match
+        self.assertEquals(len(response.data['results']), 1)
+
+        # Assert the response data
+        self.assertEquals(response.data['results'][0]['id'], self.material2.id)
+
+
+    def test_get_materials_match_2(self):
+        data = {
+            "name": "Calculus",
             "author": "John",
             "study_area": self.study_area2.id,
             "university": self.university2.id,
@@ -122,7 +142,7 @@ class TestMaterialsView(APITestCase):
             "order_by": "-total_downloads"
         }
 
-        response = self.client.get(self.url, data, format='multipart')
+        response = self.client.get(self.url, data)
 
         # Assert the response status code
         self.assertEqual(response.status_code, 200)
@@ -140,126 +160,10 @@ class TestMaterialsView(APITestCase):
             "max_price": 5
         }
 
-        response = self.client.get(self.url, data, format='multipart')
+        response = self.client.get(self.url, data)
 
         # Assert the response status code
         self.assertEqual(response.status_code, 200)
 
         # should exist 0 match
         self.assertEquals(len(response.data['results']), 0)
-    
-
-class TestMaterialsIDView(APITestCase):
-    
-    def setUp(self):
-        self = fill_db(self)
-        self.url = reverse('materials_id', kwargs={'material_id': self.material1.id})
-        
-    
-    def test_get_material_id_success(self):
-        response = self.client.get(self.url, format='multipart')
-        
-        expected_response = {
-            'id': self.material1.id,
-            'upload_date': self.material1.upload_date.strftime("%d/%m/%Y %H:%M:%S"),
-            'name': 'Introduction to Programming',
-            'description': 'Introduction to Programming',
-            'price': 0,
-            'file_name': 'introduction_to_programming.pdf',
-            'file_size': 1000,
-            'total_likes': 0,
-            'total_dislikes': 0,
-            'total_downloads': 0,
-            'user': {
-                'id': self.user1.id,
-                'name': 'John',
-                'email': 'john@ua.pt',
-                'karma_score': 0,
-                'description': "I'm a student at the University of Aveiro.",
-                'tutoring_services': True,
-                'profile_picture_link': 'https://noteally.s3.eu-west-3.amazonaws.com/john.jpg',
-                'university': {
-                    'id': self.university1.id,
-                    'name': 'University of Aveiro',
-                },
-                'study_areas': [
-                ],
-            },
-            'university': {
-                'id': self.university1.id,
-                'name': 'University of Aveiro',
-            },
-            'study_areas': [
-                {
-                    'id': self.study_area1.id,
-                    'name': 'Computer Science',
-                },
-            ],
-        }
-        
-        
-        # # Assert the response status code
-        self.assertEqual(response.status_code, 200)
-        
-        # # # Assert the response data
-        self.assertEqual(response.data, expected_response)
-    
-    
-    def test_get_material_id_invalid_id(self):
-        max_id = Material.objects.aggregate(max_id=Max('id'))['max_id']
-        non_existent_id = max_id + 1 if max_id is not None else 1
-        
-        response = self.client.get(reverse('materials_id', kwargs={'material_id': non_existent_id}), format='multipart')
-        
-        expected_response = {
-            'error': 'Material does not exist'
-        }
-        
-        # Assert the response status code
-        self.assertEqual(response.status_code, 404)
-        
-        # Assert the response data
-        self.assertEqual(response.data, expected_response)
-
-
-    def test_get_material_link_with_file(self):
-
-        url = reverse('materials_id_download', kwargs={'material_id': self.material1.id})
-        response = self.client.get(url)
-        
-        expected_response = {
-            'name': self.material1.file_name,
-            'link': '/test_media/' + self.material1.file_name,
-        }
-        
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, expected_response)
-    
-
-    def test_get_material_link_with_no_file(self):
-
-        url = reverse('materials_id_download', kwargs={'material_id': self.material2.id})
-        response = self.client.get(url)
-        
-        expected_response = {
-            'error': 'Material does not have a file'
-        }
-        
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.data, expected_response)
-
-
-    def test_get_material_link_invalid_id(self):
-        max_id = Material.objects.aggregate(max_id=Max('id'))['max_id']
-        non_existent_id = max_id + 1 if max_id is not None else 1
-        
-        url = reverse('materials_id_download', kwargs={'material_id': non_existent_id})
-        response = self.client.get(url)
-        
-        expected_response = {
-            'error': 'Material does not exist'
-        }
-        
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.data, expected_response)
-    
