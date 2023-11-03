@@ -106,10 +106,34 @@ class TestMaterialsView(APITestCase):
         self.assertEquals(len(response.data['results']), 2)
 
     
-    def test_get_materials_match(self):
+    def test_get_materials_match_1(self):
         data = {
             "name": "Calculus",
             "author": "John Doe",
+            "study_area": self.study_area2.id,
+            "university": self.university2.id,
+            "min_likes": 0,
+            "min_downloads": 0,
+            "free": "true",
+            "order_by": "-total_downloads"
+        }
+
+        response = self.client.get(self.url, data)
+
+        # Assert the response status code
+        self.assertEqual(response.status_code, 200)
+
+        # should exist 1 match
+        self.assertEquals(len(response.data['results']), 1)
+
+        # Assert the response data
+        self.assertEquals(response.data['results'][0]['id'], self.material2.id)
+
+
+    def test_get_materials_match_2(self):
+        data = {
+            "name": "Calculus",
+            "author": "John",
             "study_area": self.study_area2.id,
             "university": self.university2.id,
             "min_likes": 0,

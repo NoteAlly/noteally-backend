@@ -113,11 +113,7 @@ def handle(request):
    
 @api_view(['GET', 'PUT', 'DELETE'])
 def handle_id(request, material_id):
-    try:
-        if request.method == 'GET':
-            if "download" in request.path:
-                return get_materials_id_download(material_id)
-            return get_materials_id(material_id)
-
-    except Exception as e:
-       return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'GET':
+        if "download" in request.path:
+            return get_materials_id_download(material_id)
+        return get_materials_id(material_id)
