@@ -29,7 +29,9 @@ def get_cognito_user(access_token):
 
 def authenticate(request):
     auth_data = request.data
-    cognito_user = get_cognito_user(auth_data['access_token'])
+    access_token = auth_data['access_token']
+    id_token = auth_data['id_token']
+    cognito_user = get_cognito_user(access_token)
 
     if cognito_user is None:
         return Response({'error': 'Invalid access token or user does not exist'}, status=400)
@@ -51,6 +53,7 @@ def authenticate(request):
     user_data = {
         'id': user.id,
         'sub': user.sub,
+        'id_token': id_token,
         'first_name': user.first_name,
         'last_name': user.last_name,
         'email': user.email,

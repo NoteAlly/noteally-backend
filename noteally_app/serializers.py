@@ -14,7 +14,7 @@ class UserMaterialIDSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ('id', 'name', 'email', 'karma_score', 'description', 'tutoring_services', 'profile_picture', 'study_areas')
+        fields = ('id', 'sub', 'first_name', 'last_name', 'email', 'karma_score', 'description', 'tutoring_services', 'profile_picture', 'study_areas')
         depth = 1
         
 
@@ -109,6 +109,7 @@ class InfoSerializer(serializers.Serializer):
 class UserSessionSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     sub = serializers.CharField(max_length=100)
+    id_token = serializers.CharField(max_length=2000)
     first_name = serializers.CharField(max_length=50)
     last_name = serializers.CharField(max_length=50)
     email = serializers.CharField(max_length=100)

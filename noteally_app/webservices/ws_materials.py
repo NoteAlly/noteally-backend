@@ -31,16 +31,27 @@ def get_materials(request):
     # filtering
     if "name" in request.GET:
         materials = materials.filter(name__icontains=request.GET["name"])
+
     if "author" in request.GET:
-        materials = materials.filter(user__name__icontains=request.GET["author"])
+        names = request.GET["author"].strip().split(" ")
+        if len(names) != 0:
+            if len(names) == 1:
+                materials = materials.filter(user__first_name__icontains=names[0]) | materials.filter(user__last_name__icontains=names[0])
+            else:
+                materials = materials.filter(user__first_name__icontains=names[0], user__last_name__icontains=names[1])
+
     if "study_area" in request.GET:
         materials = materials.filter(study_areas__id=request.GET["study_area"])
+
     if "university" in request.GET:
         materials = materials.filter(university__id=request.GET["university"])
+
     if "min_likes" in request.GET:
         materials = materials.filter(total_likes__gte=request.GET["min_likes"])
+
     if "min_downloads" in request.GET:
         materials = materials.filter(total_downloads__gte=request.GET["min_downloads"])
+
     if "free" in request.GET:
         if request.GET["free"] == "true":
             materials = materials.filter(price=0)
@@ -107,5 +118,6 @@ def handle_id(request, material_id):
             if "download" in request.path:
                 return get_materials_id_download(material_id)
             return get_materials_id(material_id)
+
     except Exception as e:
        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
