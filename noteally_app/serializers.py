@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from noteally_app.models import Material, User, StudyArea, Download, Like, University
-from django.contrib.auth import authenticate 
+from noteally_app.models import Material, User, StudyArea, Download, Like, University 
 
 
 # ------------------------------ User Serializers ------------------------------
@@ -15,7 +14,7 @@ class UserMaterialIDSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ('id', 'name', 'email', 'karma_score', 'description', 'tutoring_services', 'profile_picture_link', 'university', 'study_areas')
+        fields = ('id', 'name', 'email', 'karma_score', 'description', 'tutoring_services', 'profile_picture', 'study_areas')
         depth = 1
         
 
@@ -104,41 +103,17 @@ class LikeSerializer(serializers.ModelSerializer):
 class InfoSerializer(serializers.Serializer):
     universities = UniversityValueSerializer(many=True)
     study_areas = ValueStudyAreaSerializer(many=True)
-    
+
+
 # ------------------------------ Auth Serializers ------------------------------
-class RegisterSerializer(serializers.ModelSerializer):
-    
-   
-    class Meta:
-        model = User
-        fields = ('id', 'password', 'id_aws', 'name', 'email', 'university', 'description', 'tutoring_services')
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
-    def save(self):
-        user = User(
-            id_aws=self.validated_data['id_aws'], 
-            name=self.validated_data['name'],  
-            email=self.validated_data['email'],
-            premium=False,
-            university=self.validated_data['university'],
-            karma_score=0,
-            description=self.validated_data['description'],
-            tutoring_services=self.validated_data['tutoring_services'],
-            profile_picture_name="",
-            profile_picture_link="") 
-        password = self.validated_data['password']
-        user.set_password(password)
-        user.save()
-        return user
-
-class LoginSerializer(serializers.Serializer):
-    email = serializers.CharField()
-    password = serializers.CharField()
-
-    def validate(self, data):
-        user = authenticate(**data)
-        
-        if user and user.is_active:
-            return user
-        raise serializers.ValidationError("Incorrect Credentials")
+class UserSessionSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    sub = serializers.CharField(max_length=100)
+    first_name = serializers.CharField(max_length=50)
+    last_name = serializers.CharField(max_length=50)
+    email = serializers.CharField(max_length=100)
+    premium = serializers.BooleanField()
+    karma_score = serializers.IntegerField()
+    tutoring_services = serializers.BooleanField()
+    profile_picture = serializers.FileField()
+    registered = serializers.BooleanField()

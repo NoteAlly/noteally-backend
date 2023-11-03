@@ -186,6 +186,10 @@ STORAGES = {
 }
 
 
+# AMAZON COGNITO SETTINGS
+COGNITO_DOMAIN = os.environ.get('AWS_COGNITO_DOMAIN')
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
