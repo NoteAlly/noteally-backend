@@ -32,7 +32,8 @@ DEBUG = False
 ALLOWED_HOSTS = []
 
 CORS_ALLOW_HEADERS = [
-    "user_id"
+    "user_id",
+    "Authorization",
 ]
 
 

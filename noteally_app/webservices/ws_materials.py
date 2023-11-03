@@ -101,14 +101,10 @@ def get_materials_id_download(material_id):
 
 @api_view(['GET', 'POST'])
 def handle(request):
-    try:
-        if request.method == 'POST':
-            return post_materials(request)
-        elif request.method == 'GET':
-            return get_materials(request)
-
-    except Exception as e:
-       return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'POST':
+        return post_materials(request)
+    elif request.method == 'GET':
+        return get_materials(request)
    
    
 @api_view(['GET', 'PUT', 'DELETE'])
