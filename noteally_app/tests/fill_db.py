@@ -39,6 +39,19 @@ def fill_db(self):
         profile_picture="https://noteally.s3.eu-west-3.amazonaws.com/jane.jpg",
     )
 
+    self.user3 = User.objects.create(
+        sub="989898989",
+        first_name="Peter",
+        last_name="Doe",
+        email="peter@ua.pt",
+        premium=False,
+        karma_score=0,
+        description="I'm a student at the University of Aveiro.",
+        tutoring_services=False,
+        profile_picture_name="peter.jpg",
+        profile_picture="https://noteally.s3.eu-west-3.amazonaws.com/peter.jpg",
+    )
+
     # Insert 2 materials
     self.material1 = Material.objects.create(
         user=self.user1,
@@ -65,16 +78,12 @@ def fill_db(self):
     # Insert 2 Download
     self.download1 = Download.objects.create(
         user=self.user1,
-        resource=self.material1,
-        download_date="2021-05-01 00:00:00",
-        hidden=False,
+        resource=self.material1
     )
     
     self.download2 = Download.objects.create(
         user=self.user2,
-        resource=self.material1,
-        download_date="2021-05-01 00:00:00",
-        hidden=False,
+        resource=self.material1
     )
     
     # Insert 1 Like
