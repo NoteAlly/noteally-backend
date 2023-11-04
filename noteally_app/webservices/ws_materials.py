@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from noteally_app.CustomPagination import CustomPagination
 from noteally_app.serializers import MaterialIDSerializer, PostMaterialSerializer, MaterialSerializer
-from noteally_app.models import Material
+from noteally_app.models import Material, Download, User
 import uuid
 
 
@@ -80,23 +80,14 @@ def get_materials(request):
 def get_materials_id(material_id):
     try:
         material = Material.objects.get(id=material_id)
+        owned = Download.objects.filter(user=material.user, resource=material).exists()
+        serializer = MaterialIDSerializer(material)
+        data = serializer.data.copy()
+        data["owned"] = owned
     except Material.DoesNotExist:
         return Response({'error': 'Material does not exist'}, status=status.HTTP_404_NOT_FOUND)
     
-    serializer = MaterialIDSerializer(material)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-def get_materials_id_download(material_id):
-    try:
-        material = Material.objects.get(id=material_id)
-    except Material.DoesNotExist:
-        return Response({'error': 'Material does not exist'}, status=status.HTTP_404_NOT_FOUND)
-    
-    if not material.file:
-        return Response({'error': 'Material does not have a file'}, status=status.HTTP_404_NOT_FOUND)
-    
-    return Response({"name": material.file_name, "link": material.file.url}, status=status.HTTP_200_OK)
+    return Response(data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET', 'POST'])
@@ -110,6 +101,4 @@ def handle(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 def handle_id(request, material_id):
     if request.method == 'GET':
-        if "download" in request.path:
-            return get_materials_id_download(material_id)
         return get_materials_id(material_id)
