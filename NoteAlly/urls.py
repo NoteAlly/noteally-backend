@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from noteally_app.webservices import ws_info, ws_materials, ws_test, ws_auth   # import specific views
+from noteally_app.webservices import ws_info, ws_materials, ws_test, ws_auth, ws_downloads
 from noteally_app import views  # import generic views
 
 urlpatterns = [
@@ -27,5 +27,6 @@ urlpatterns = [
     path('materials/', ws_materials.handle, name="materials"),
     path('login/', ws_auth.handle, name="login"),
     path('materials/<int:material_id>/', ws_materials.handle_id, name="materials_id"),
-    path('materials/<int:material_id>/download', ws_materials.handle_id, name="materials_id_download"),
+    path('downloads/', ws_downloads.handle, name="downloads"),
+    path('downloads/<int:material_id>', ws_downloads.handle_id, name="downloads_id"),
 ]

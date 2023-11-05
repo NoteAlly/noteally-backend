@@ -48,7 +48,7 @@ class Material(models.Model):
 class Download(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     resource = models.ForeignKey(Material, on_delete=models.CASCADE)
-    download_date = models.DateTimeField()
+    download_date = models.DateTimeField(auto_now_add=True)
     hidden = models.BooleanField(default=False) # If the user has hidden the download
 
 
