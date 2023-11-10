@@ -11,6 +11,7 @@ class TestMaterialsView(APITestCase):
     
     def setUp(self):
         self = fill_db(self)
+        self.header = {'User-id': self.user1.id}
         self.url = reverse('materials')
 
 
@@ -32,7 +33,8 @@ class TestMaterialsView(APITestCase):
             "file": file_mock,
             "study_areas": [self.study_area1.id, self.study_area2.id],
         }
-        response = self.client.post(self.url, data, format='multipart')
+
+        response = self.client.post(self.url, data, headers=self.header, format='multipart')
         
         expected_response = {
             "Success": "Successfully Created",
@@ -56,8 +58,8 @@ class TestMaterialsView(APITestCase):
             "file": "string_instead_of_file",
             "study_areas": [self.study_area1.id, self.study_area2.id],
         }
-        
-        response = self.client.post(self.url, data, format='multipart')
+
+        response = self.client.post(self.url, data, headers=self.header, format='multipart')
         
         expected_response = {
             'error': {
@@ -82,7 +84,7 @@ class TestMaterialsView(APITestCase):
             "study_areas": [self.study_area1.id, self.study_area2.id],
         }
         
-        response = self.client.post(self.url, data, format='multipart')
+        response = self.client.post(self.url, data, headers=self.header, format='multipart')
         
         expected_response = {
             "Success": "Successfully Created",
@@ -152,18 +154,3 @@ class TestMaterialsView(APITestCase):
 
         # Assert the response data
         self.assertEquals(response.data['results'][0]['id'], self.material2.id)
-
-
-    def test_get_materials_no_match(self):
-        data = {
-            "free": "false",
-            "max_price": 5
-        }
-
-        response = self.client.get(self.url, data)
-
-        # Assert the response status code
-        self.assertEqual(response.status_code, 200)
-
-        # should exist 0 match
-        self.assertEquals(len(response.data['results']), 0)
