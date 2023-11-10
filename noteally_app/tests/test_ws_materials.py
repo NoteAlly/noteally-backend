@@ -112,11 +112,11 @@ class TestMaterialsView(APITestCase):
         data = {
             "name": "Calculus",
             "author": "John Doe",
-            "study_area": self.study_area2.id,
+            "study_areas": self.study_area2.id,
             "university": self.university2.id,
             "min_likes": 0,
             "min_downloads": 0,
-            "free": "true",
+            "max_price": 10,
             "order_by": "-total_downloads"
         }
 
@@ -136,7 +136,7 @@ class TestMaterialsView(APITestCase):
         data = {
             "name": "Calculus",
             "author": "John",
-            "study_area": self.study_area2.id,
+            "study_areas": self.study_area2.id,
             "university": self.university2.id,
             "min_likes": 0,
             "min_downloads": 0,
