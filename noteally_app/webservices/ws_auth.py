@@ -67,7 +67,16 @@ def authenticate(request):
     return Response(session_serializer.data, status=200)
 
 
+def logout(request):
+    return Response({'success': 'Logged out'}, status=200)
+
+
+
 @api_view(['POST'])
 def handle(request):
-    if request.method == 'POST':
+    path = request.path
+
+    if path == '/login/' and request.method == 'POST':
         return authenticate(request)
+    elif path == '/logout/' and request.method == 'POST':
+        return logout(request)
