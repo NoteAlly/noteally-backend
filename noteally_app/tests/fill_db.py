@@ -12,7 +12,7 @@ def fill_db(self):
     self.university1 = University.objects.create(name="University of Aveiro")
     self.university2 = University.objects.create(name="University of Lisboa")
     
-    # Insert 2 users
+    # Insert 3 users
     self.user1 = User.objects.create(
         sub="123456789",
         first_name="John",

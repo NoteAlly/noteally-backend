@@ -7,7 +7,6 @@ import requests
 
 
 def get_cognito_user(access_token):
-    # NOSONAR
     cognito_domain = settings.COGNITO_DOMAIN
     url = f'https://{cognito_domain}/oauth2/userInfo'
     headers = {'Authorization': f'Bearer {access_token}'}

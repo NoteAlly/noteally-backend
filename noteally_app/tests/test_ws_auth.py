@@ -11,6 +11,7 @@ class TestAuthView(APITestCase):
     def setUp(self):
         self.url = reverse('login')
 
+
     def test_get_cognito_user_success(self, mock_requests):
 
         # mock response
