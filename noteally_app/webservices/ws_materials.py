@@ -3,11 +3,16 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from noteally_app.CustomPagination import CustomPagination
 from noteally_app.serializers import MaterialIDSerializer, PostMaterialSerializer, MaterialSerializer
-from noteally_app.models import Material, Download, User
+from noteally_app.models import Material, Download, User, Like
 import uuid
 
 
 def post_materials(request):
+    user_id = request.headers['User-id']
+    user = User.objects.get(id=user_id)
+    user.karma_score += 3
+    user.save()
+
     data_ = request.data.copy()
 
     if 'file' in request.FILES:
@@ -40,8 +45,9 @@ def get_materials(request):
             else:
                 materials = materials.filter(user__first_name__icontains=names[0], user__last_name__icontains=names[1])
 
-    if "study_area" in request.GET:
-        materials = materials.filter(study_areas__id=request.GET["study_area"])
+    if "study_areas" in request.GET:
+        study_areas = request.GET.getlist("study_areas")
+        materials = materials.filter(study_areas__in=study_areas)
 
     if "university" in request.GET:
         materials = materials.filter(university__id=request.GET["university"])
@@ -55,8 +61,6 @@ def get_materials(request):
     if "free" in request.GET:
         if request.GET["free"] == "true":
             materials = materials.filter(price=0)
-        else:
-            materials = materials.filter(price__gt=0)
         
         if "max_price" in request.GET:
             materials = materials.filter(price__lte=request.GET["max_price"])
@@ -77,13 +81,32 @@ def get_materials(request):
     return Response(paginated_response.data, status=status.HTTP_200_OK)
 
 
-def get_materials_id(material_id):
+def get_materials_id(request, material_id):
     try:
+        user_id = request.headers['User-id']
+        user = User.objects.get(id=user_id)
+
         material = Material.objects.get(id=material_id)
-        owned = Download.objects.filter(user=material.user, resource=material).exists()
+        owned = Download.objects.filter(user=user, resource=material).exists()
+        liked = Like.objects.filter(user=user, resource=material).exists()
+
+
         serializer = MaterialIDSerializer(material)
         data = serializer.data.copy()
         data["owned"] = owned
+
+        if material.price == 0:
+            data["owned"] = False
+
+        if material.user.id == user.id:
+            data["owned"] = True
+
+        if liked:
+            like = Like.objects.get(user=user, resource=material)
+            data["like"] = like.like
+        else:
+            data["like"] = None
+        
     except Material.DoesNotExist:
         return Response({'error': 'Material does not exist'}, status=status.HTTP_404_NOT_FOUND)
     
@@ -101,4 +124,4 @@ def handle(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 def handle_id(request, material_id):
     if request.method == 'GET':
-        return get_materials_id(material_id)
+        return get_materials_id(request, material_id)

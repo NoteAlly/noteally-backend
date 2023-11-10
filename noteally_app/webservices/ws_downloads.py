@@ -11,10 +11,14 @@ def get_materials_id_download(request, material_id):
         user = User.objects.get(id=user_id)
 
         material = Material.objects.get(id=material_id)
-        material.total_downloads += 1
-        material.save()
 
         if not Download.objects.filter(user=user, resource=material).exists():
+            author = material.user
+            author.karma_score += 5
+            author.save()
+
+            material.total_downloads += 1
+            material.save()
             download = Download(user=user, resource=material)
             download.save()
 

@@ -17,8 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from noteally_app.webservices import ws_info, ws_materials, ws_test, ws_auth, ws_downloads
-from noteally_app import views  # import generic views
+from noteally_app.webservices import ws_info, ws_materials, ws_rating, ws_test, ws_auth, ws_downloads
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +29,10 @@ urlpatterns = [
     path('materials/<int:material_id>/', ws_materials.handle_id, name="materials_id"),
     path('downloads/', ws_downloads.handle, name="downloads"),
     path('downloads/<int:material_id>', ws_downloads.handle_id, name="downloads_id"),
+    path('like/<int:material_id>', ws_rating.handle_like, name="like"),
+    path('dislike/<int:material_id>', ws_rating.handle_dislike, name="dislike")
 ]
+
+if settings.DEBUG:
+    from django.conf.urls.static import static
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
