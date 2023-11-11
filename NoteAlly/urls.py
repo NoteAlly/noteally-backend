@@ -26,6 +26,7 @@ urlpatterns = [
     path('populate/', ws_test.populate_db, name="populate"),
     path('materials/', ws_materials.handle, name="materials"),
     path('login/', ws_auth.handle, name="login"),
+    path('update_profile/', ws_auth.update_profile, name="update_profile"),
     path('materials/<int:material_id>/', ws_materials.handle_id, name="materials_id"),
     path('downloads/', ws_downloads.handle, name="downloads"),
     path('downloads/<int:material_id>', ws_downloads.handle_id, name="downloads_id"),

@@ -62,6 +62,9 @@ def authenticate(request):
         'karma_score': user.karma_score,
         'tutoring_services': user.tutoring_services,
         'profile_picture': user.profile_picture,
+        'study_areas': user.study_areas,
+        'description': user.description,
+        'university': user.university,
         'registered': registered
     }
     session_serializer = UserSessionSerializer(user_data)
@@ -72,3 +75,44 @@ def authenticate(request):
 def handle(request):
     if request.method == 'POST':
         return authenticate(request)
+    
+@api_view(['POST'])
+def update_profile(request):
+    
+    # Handle Data and possible errors
+    new_data = request.data
+    user_id = new_data['id']  
+    id_token = new_data['id']  
+    user_in_db = User.objects.filter(id=user_id).count() == 1
+    registered = True
+
+    if not user_in_db:
+        return Response({'error': 'User not in database'}, status=400)
+
+    # Update User Info with new data
+    
+    user = User.objects.get(id=user_id)
+    user.description = new_data["description"]
+    user.university.set(new_data["university"]) 
+    user.study_areas.set(new_data["study_areas"]) 
+    user.save()
+    
+    # Success Response
+    user_data = {
+        'id': user.id,
+        'sub': user.sub,
+        'id_token': id_token,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'email': user.email,
+        'premium': user.premium,
+        'karma_score': user.karma_score,
+        'tutoring_services': user.tutoring_services,
+        'profile_picture': user.profile_picture,
+        'study_areas': user.study_areas,
+        'description': user.description,
+        'university': user.university,
+        'registered': registered
+    }
+    session_serializer = UserSessionSerializer(user_data)
+    return Response(session_serializer.data, status=200)
