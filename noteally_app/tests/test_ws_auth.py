@@ -98,7 +98,9 @@ class TestAuthView(APITestCase):
             'karma_score': 0,
             'tutoring_services': False,
             'profile_picture': None,
-            'registered': False
+            'registered': False,
+            'description': '', 
+            'study_areas': []
         }
 
         # Assert the response status code
@@ -151,7 +153,9 @@ class TestAuthView(APITestCase):
             'karma_score': 0,
             'tutoring_services': False,
             'profile_picture': None,
-            'registered': True
+            'registered': True,
+            'description': '', 
+            'study_areas': []
         }
 
         # Assert the response status code
