@@ -64,7 +64,6 @@ def authenticate(request):
         'profile_picture': user.profile_picture,
         'study_areas': user.study_areas,
         'description': user.description,
-        'university': user.university,
         'registered': registered
     }
     session_serializer = UserSessionSerializer(user_data)
@@ -93,7 +92,6 @@ def update_profile(request):
     
     user = User.objects.get(id=user_id)
     user.description = new_data["description"]
-    user.university.set(new_data["university"]) 
     user.study_areas.set(new_data["study_areas"]) 
     user.save()
     
@@ -111,7 +109,6 @@ def update_profile(request):
         'profile_picture': user.profile_picture,
         'study_areas': user.study_areas,
         'description': user.description,
-        'university': user.university,
         'registered': registered
     }
     session_serializer = UserSessionSerializer(user_data)
