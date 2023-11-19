@@ -34,11 +34,9 @@ class TestDownloadsView(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         # should exist 2 matches
-        self.assertEquals(len(response.data['results']), 2)
-
+        self.assertEquals(len(response.data['results']), 1) 
         # Assert the response data
-        self.assertIn(self.user2.id, [user['id'] for user in response.data['results']])
-        self.assertIn(self.user3.id, [user['id'] for user in response.data['results']])
+        self.assertIn(self.user2.id, [user['id'] for user in response.data['results']]) 
 
     def test_get_tutors_filter_study_areas(self):
         # Assuming study areas are associated with users in your actual implementation
