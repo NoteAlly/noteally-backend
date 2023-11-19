@@ -13,6 +13,7 @@ class TestAuthView(APITestCase):
         self.study_area1 = StudyArea.objects.create(name="Computer Science")
         self.url = reverse('login')
 
+
     def test_get_cognito_user_success(self, mock_requests):
 
         # mock response

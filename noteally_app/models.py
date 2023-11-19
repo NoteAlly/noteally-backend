@@ -20,7 +20,7 @@ class User(models.Model):
     email = models.CharField(max_length=100)
     premium = models.BooleanField(default=False)
     karma_score = models.IntegerField(default=0)
-    study_areas = models.ManyToManyField(StudyArea)
+    study_areas = models.ManyToManyField(StudyArea) 
     description = models.TextField(blank=True)
     tutoring_services = models.BooleanField(default=False)
     profile_picture_name = models.CharField(max_length=100, blank=True)
