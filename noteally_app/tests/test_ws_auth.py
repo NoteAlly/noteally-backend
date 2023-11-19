@@ -3,12 +3,14 @@ from unittest.mock import patch, MagicMock
 from django.urls import reverse
 from noteally_app.models import User
 from noteally_app.webservices.ws_auth import get_cognito_user
+from noteally_app.models import StudyArea
 
 
 @patch('noteally_app.webservices.ws_auth.requests')
 class TestAuthView(APITestCase):
     
     def setUp(self):
+        self.study_area1 = StudyArea.objects.create(name="Computer Science")
         self.url = reverse('login')
 
 
@@ -97,7 +99,9 @@ class TestAuthView(APITestCase):
             'karma_score': 0,
             'tutoring_services': False,
             'profile_picture': None,
-            'registered': False
+            'registered': False,
+            'description': '', 
+            'study_areas': []
         }
 
         # Assert the response status code
@@ -150,7 +154,9 @@ class TestAuthView(APITestCase):
             'karma_score': 0,
             'tutoring_services': False,
             'profile_picture': None,
-            'registered': True
+            'registered': True,
+            'description': '', 
+            'study_areas': []
         }
 
         # Assert the response status code
@@ -181,3 +187,45 @@ class TestAuthView(APITestCase):
 
         # Assert the response status code
         self.assertEqual(response.status_code, 400)
+    
+    def test_update_profile_success(self, mock_requests):
+        # Mocking the request data
+        data = {
+            'id': 1,
+            'id_token': '0123456789',
+            'description': 'Updated description',
+            'study_areas': [1]  # Ensure study_areas is a list
+        }
+
+        # Ensure the user exists in the database
+        user = User.objects.create(
+            id=1,
+            sub='0123456789',
+            first_name='John',
+            last_name='Doe',
+            email='johndoe@gmail.com'
+        )
+ 
+
+        # Mocking the response from the endpoint
+        response = self.client.post(reverse('update_profile'), data, format='json')
+
+        # Assert the response status code
+        self.assertEqual(response.status_code, 200)
+ 
+        
+    def test_update_profile_user_not_in_database(self, mock_requests):
+        # Mocking the request data
+        data = {
+            'id': 1,
+            'id_token': '0123456789',
+            'description': 'Updated description',
+            'study_areas': ['Math', 'Physics']
+        }
+
+        # Mocking the response from the endpoint when the user is not in the database
+        response = self.client.post(reverse('update_profile'), data, format='json')
+
+        # Assert the response status code and error message
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['error'], 'User not in database')

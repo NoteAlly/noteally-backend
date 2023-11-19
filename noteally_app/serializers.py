@@ -119,3 +119,5 @@ class UserSessionSerializer(serializers.Serializer):
     tutoring_services = serializers.BooleanField()
     profile_picture = serializers.FileField()
     registered = serializers.BooleanField()
+    description = serializers.CharField(max_length=2000) 
+    study_areas = ValueStudyAreaSerializer(many=True)

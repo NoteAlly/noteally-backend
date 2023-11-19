@@ -25,6 +25,7 @@ urlpatterns = [
     path('info/', ws_info.handle, name="info"),
     path('populate/', ws_test.populate_db, name="populate"),
     path('login/', ws_auth.handle, name="login"),
+    path('update_profile/', ws_auth.update_profile, name="update_profile"),
     path('materials/', ws_materials.handle, name="materials"),
     path('materials/<int:material_id>/', ws_materials.handle_id, name="materials_id"),
     path('tutors/', ws_tutors.handle, name="tutors"),
