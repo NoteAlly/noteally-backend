@@ -42,10 +42,10 @@ def get_tutors(request):
 
     return Response(paginated_response.data, status=status.HTTP_200_OK)
 
-def get_tutors_id(request, user_id):
+def get_tutors_id(request, tutors_id):
     try: 
 
-        user = User.objects.get(id=user_id) 
+        user = User.objects.get(id=tutors_id) 
         
         serializer = UserSerializer(user)
         data = serializer.data.copy() 
@@ -64,6 +64,6 @@ def handle(request):
    
    
 @api_view(['GET'])
-def handle_id(request, user_id):
+def handle_id(request, tutors_id):
     if request.method == 'GET':
-        return get_tutors_id(request, user_id)
+        return get_tutors_id(request, tutors_id)

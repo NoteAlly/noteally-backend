@@ -7,7 +7,7 @@ from rest_framework.exceptions import ErrorDetail
 import shutil
 from noteally_app.models import StudyArea, User
 
-class TestDownloadsView(APITestCase):
+class TestTutorsView(APITestCase):
     def setUp(self):
         # Set up any necessary data for your tests
         self.url = reverse('tutors')  # Update with your actual URL for the get_tutors endpoint 
@@ -81,3 +81,29 @@ class TestDownloadsView(APITestCase):
         # Assert the order of results based on karma score
         karma_scores = [user['karma_score'] for user in response.data['results']]
         self.assertEqual(karma_scores, [10, 8, 5])
+        
+    def test_get_tutors_id_success(self): 
+        valid_url = reverse('tutors_id',  kwargs={'tutors_id': self.user1.id})
+        response = self.client.get(valid_url)
+
+        # Assert the response status code
+        self.assertEqual(response.status_code, 200)
+        print("\n\n\n\n\n")
+        print(response.data)
+        # Assert the response data
+        self.assertEqual(response.data['id'], self.user1.id)
+        self.assertEqual(response.data['first_name'], self.user1.first_name)
+        self.assertEqual(response.data['last_name'], self.user1.last_name)
+        self.assertEqual(response.data['karma_score'], self.user1.karma_score)
+
+    def test_get_tutors_id_not_found(self):
+        # Assuming there is no user with an ID of 9999
+        invalid_url = reverse('tutors_id',kwargs={'tutors_id': 99999})
+
+        response = self.client.get(invalid_url)
+
+        # Assert the response status code
+        self.assertEqual(response.status_code, 404)
+
+        # Assert the error message
+        self.assertEqual(response.data['error'], 'Tutor does not exist')
