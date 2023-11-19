@@ -12,10 +12,7 @@ def get_tutors(request):
 
     # Filtering
     if "karma_score" in request.GET:
-        users = users.filter(karma_score__gte=request.GET["karma_score"])
-
-    if "university" in request.GET:
-        users = users.filter(university__id=request.GET["university"])
+        users = users.filter(karma_score__gte=request.GET["karma_score"]) 
 
     if "study_areas" in request.GET:
         study_areas = request.GET.getlist("study_areas")
