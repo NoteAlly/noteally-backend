@@ -13,7 +13,7 @@ ENV AWS_S3_REGION_NAME=$AWS_S3_REGION_NAME
 ENV AWS_COGNITO_DOMAIN=$AWS_COGNITO_DOMAIN
 
 
-RUN git clone https://github.com/NoteAlly/noteally-backend.git /drf_src
+RUN git clone -b NOTE-112-dockerize-rest-api https://github.com/NoteAlly/noteally-backend.git /drf_src
 # COPY . /drf_src
 
 WORKDIR /drf_src
