@@ -12,9 +12,7 @@ ENV AWS_DEFAULT_ACL=$AWS_DEFAULT_ACL
 ENV AWS_S3_REGION_NAME=$AWS_S3_REGION_NAME
 ENV AWS_COGNITO_DOMAIN=$AWS_COGNITO_DOMAIN
 
-
 RUN git clone -b NOTE-112-dockerize-rest-api https://github.com/NoteAlly/noteally-backend.git /drf_src
-# COPY . /drf_src
 
 WORKDIR /drf_src
 
@@ -35,9 +33,6 @@ CMD echo "DJANGO_KEY=$DJANGO_KEY" >> .env; \
     echo "AWS_DEFAULT_ACL=$AWS_DEFAULT_ACL" >> .env; \
     echo "AWS_S3_REGION_NAME=$AWS_S3_REGION_NAME" >> .env; \
     echo "AWS_COGNITO_DOMAIN=$AWS_COGNITO_DOMAIN" >> .env; \
-    python3 manage.py makemigrations --settings=NoteAlly.development_settings; \
-    python3 manage.py migrate --run-syncdb --settings=NoteAlly.development_settings; \
-    python manage.py runserver 0.0.0.0:8000 --settings=NoteAlly.development_settings
-    # python3 manage.py makemigrations --settings=NoteAlly.production_settings; \
-    # python3 manage.py migrate --run-syncdb --settings=NoteAlly.production_settings; \
-    # python manage.py runserver 0.0.0.0:8000 --settings=NoteAlly.production_settings
+    python3 manage.py makemigrations --settings=NoteAlly.production_settings; \
+    python3 manage.py migrate --run-syncdb --settings=NoteAlly.production_settings; \
+    python manage.py runserver 0.0.0.0:8000 --settings=NoteAlly.production_settings
