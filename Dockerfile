@@ -4,14 +4,6 @@ FROM python:3.11.4
 # Load Variables
 # ARG variable are only available during the build process while ENV variables are also available in the container
 
-ENV DJANGO_KEY=$DJANGO_KEY
-ENV AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-ENV AWS_STORAGE_BUCKET_NAME=$AWS_STORAGE_BUCKET_NAME
-ENV AWS_DEFAULT_ACL=$AWS_DEFAULT_ACL
-ENV AWS_S3_REGION_NAME=$AWS_S3_REGION_NAME
-ENV AWS_COGNITO_DOMAIN=$AWS_COGNITO_DOMAIN
-
 RUN git clone -b NOTE-112-dockerize-rest-api https://github.com/NoteAlly/noteally-backend.git /drf_src
 
 WORKDIR /drf_src
