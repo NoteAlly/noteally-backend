@@ -2,7 +2,7 @@
 FROM python:3.11.4
 
 # Clone the lastest version of the backend
-RUN git clone -b NOTE-112-dockerize-rest-api https://github.com/NoteAlly/noteally-backend.git /drf_src
+RUN git clone https://github.com/NoteAlly/noteally-backend.git /drf_src
 
 # Set the working directory to /drf_src
 WORKDIR /drf_src
