@@ -1,11 +1,10 @@
 # Use official Python runtime as a parent image
 FROM python:3.11.4
 
-# Load Variables
-# ARG variable are only available during the build process while ENV variables are also available in the container
-
+# Clone the lastest version of the backend
 RUN git clone -b NOTE-112-dockerize-rest-api https://github.com/NoteAlly/noteally-backend.git /drf_src
 
+# Set the working directory to /drf_src
 WORKDIR /drf_src
 
 # Setting PYTHONUNBUFFERED=1 allows for log messages to be immediately dumped to the stream instead of being buffered.
@@ -15,7 +14,18 @@ ENV PYTHONUNBUFFERED 1
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
 
+# Expose port 8000 to the outside world
 EXPOSE 8000
+
+# Create a group and user to run our app
+RUN addgroup --system nonroot \
+    && adduser --system --group nonroot
+
+# Give nonroot user ownership of the directory
+RUN chown -R nonroot:nonroot .
+
+# Change to the nonroot user
+USER nonroot
 
 # Create a .env file with the environment variables and run the development server
 CMD echo "DJANGO_KEY=$DJANGO_KEY" >> .env; \
