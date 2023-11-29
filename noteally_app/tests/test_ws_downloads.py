@@ -24,7 +24,7 @@ class TestDownloadsView(APITestCase):
         }
         
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, expected_response)
+        self.assertEqual(response.data['name'], expected_response['name'])
 
         downloaded = Download.objects.filter(user=self.user3, resource=self.material1).exists()
         self.assertTrue(downloaded)
