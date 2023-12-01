@@ -52,13 +52,14 @@ def handle(request):
     if request.method == 'GET':
         return get_posts(request)
     
-@api_view(['GET'])
-def handle_user_id(request, user_id):
-    if request.method == 'GET':
-        print(request)
-        return get_posts_by_user(request, user_id)
-
 @api_view(['DELETE'])
 def handle_id(request, material_id):
     if request.method == 'DELETE':
         return delete_post(request, material_id)
+    
+@api_view(['GET'])
+def handle_user_id(request, user_id):
+    if request.method == 'GET':
+        return get_posts_by_user(request, user_id)
+
+

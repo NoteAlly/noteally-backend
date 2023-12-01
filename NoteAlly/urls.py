@@ -35,7 +35,7 @@ urlpatterns = [
     path('like/<int:material_id>', ws_rating.handle_like, name="like"),
     path('dislike/<int:material_id>', ws_rating.handle_dislike, name="dislike"),
     path('posts/', ws_posts.handle, name="posts"),
-    path('posts/<int:user_id>', ws_posts.handle_user_id, name="posts_user_id"),
+    path('tutorposts/<int:user_id>', ws_posts.handle_user_id, name="posts_user_id"),
     path('posts/<int:material_id>', ws_posts.handle_id, name="posts_id"),
     path('unlock_premium/', ws_user.handle, name="unlock_premium"),
 ]
