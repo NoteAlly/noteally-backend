@@ -88,8 +88,6 @@ class TestTutorsView(APITestCase):
 
         # Assert the response status code
         self.assertEqual(response.status_code, 200)
-        print("\n\n\n\n\n")
-        print(response.data)
         # Assert the response data
         self.assertEqual(response.data['id'], self.user1.id)
         self.assertEqual(response.data['first_name'], self.user1.first_name)

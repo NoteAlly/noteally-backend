@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from noteally_app.webservices import ws_info, ws_materials, ws_tutors, ws_rating, ws_test, ws_auth, ws_downloads, ws_posts
+from noteally_app.webservices import ws_info, ws_materials, ws_tutors, ws_rating, ws_test, ws_auth, ws_downloads, ws_posts, ws_user
 from django.conf import settings
 
 urlpatterns = [
@@ -37,6 +37,7 @@ urlpatterns = [
     path('posts/', ws_posts.handle, name="posts"),
     path('posts/<int:user_id>', ws_posts.handle_user_id, name='posts_user_id'),
     path('posts/<int:material_id>', ws_posts.handle_id, name="posts_id"),
+    path('unlock_premium/', ws_user.handle, name="unlock_premium"),
 ]
 
 if settings.DEBUG:

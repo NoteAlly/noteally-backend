@@ -1,4 +1,5 @@
 from rest_framework.test import APITestCase
+from unittest.mock import patch, MagicMock
 from django.urls import reverse
 from noteally_app.tests.fill_db import fill_db
 from django.db.models import Max
@@ -10,9 +11,14 @@ class TestDownloadsView(APITestCase):
     
     def setUp(self):
         self = fill_db(self)
+    
+    
+    @patch('noteally_app.webservices.ws_downloads.boto3')
+    def test_download_material(self, mock_boto3):
+        # mock response from boto3
+        mock_boto3.client.return_value = MagicMock()
+        mock_boto3.client.return_value.generate_presigned_url.return_value = '/test_media/' + self.material1.file_name
 
-
-    def test_download_material(self):
         headers = {'User-id': self.user3.id}
         url = reverse('downloads_id', kwargs={'material_id': self.material1.id})
 
