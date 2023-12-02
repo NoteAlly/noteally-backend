@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from noteally_app.CustomPagination import CustomPagination
 from noteally_app.serializers import MaterialIDSerializer, PostMaterialSerializer, MaterialSerializer
-from noteally_app.models import Material, Download, User, Like
+from noteally_app.models import Material, Download, User, Like 
 import uuid
 
 
@@ -25,10 +25,13 @@ def post_materials(request):
         if 'file' in request.FILES:
             serializer.validated_data['file'].name = str(uuid.uuid4()) + '.' + data_['file_name'].split('.')[-1]
         object_ = serializer.save()
+        
+        #Notify all subscribers
+        subscribers = user.followers_set.all()  
+        
         return Response({"Success": "Successfully Created", "created_id": object_.id}, status=status.HTTP_201_CREATED)
         
-    return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
+    return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST) 
 
 def get_materials(request):
     materials = Material.objects.all()
