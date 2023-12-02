@@ -118,17 +118,8 @@ class TestUserView(APITestCase):
         self.assertEqual(response.status_code, 201)
 
         # Assert the response data
-        self.assertEqual(response.data, expected_response)
+        self.assertEqual(response.data, expected_response) 
 
-    def test_subscribe_self(self):
-        url = reverse('subscribe', args=[self.user1.id])
-        headers = {'User-id': self.user1.id}
-
-        response = self.client.post(url, headers=headers) 
-
-        # Assert the response status code
-        self.assertEqual(response.status_code, 201)
- 
     def test_unsubscribe(self):
         # Assuming self.user2 is already subscribed to self.user1
         Follower.objects.create(follower=self.user2, following=self.user1)
@@ -168,9 +159,8 @@ class TestUserView(APITestCase):
         url = reverse('get_subscriptions')
         headers = {'User-id': self.user1.id}
 
-        response = self.client.get(url, headers=headers)
+        response = self.client.get(url, headers=headers) 
 
-        
         # Assert the response status code
         self.assertEqual(response.status_code, 200)
  

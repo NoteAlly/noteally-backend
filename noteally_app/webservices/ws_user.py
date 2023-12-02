@@ -31,10 +31,7 @@ def subscribe(request, user_id):
         user_to_follow = User.objects.get(id=user_id)
         user = User.objects.get(id=request.headers['User-id'])
     except User.DoesNotExist:
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    if user_to_follow == request.user:
-        return Response({'error': 'Cannot follow yourself'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND) 
 
     # Check if the user is already following
     if Follower.objects.filter(follower=user, following=user_to_follow).exists():
