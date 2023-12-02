@@ -12,6 +12,8 @@ class University(models.Model):
     name = models.CharField(max_length=100)
 
 
+
+
 class User(models.Model):
     id = models.AutoField(primary_key=True) 
     sub = models.CharField(max_length=100, unique=True)  
@@ -26,7 +28,15 @@ class User(models.Model):
     profile_picture_name = models.CharField(max_length=100, blank=True)
     profile_pic_size = models.IntegerField(default=0)
     profile_picture = models.FileField(upload_to='profile_pictures/', blank=True)
+    followers = models.ManyToManyField('self', through="Follower", through_fields=('follower', 'following'), symmetrical=False, related_name='following_users')
+    #followings = models.ManyToManyField('self', through="Follower", symmetrical=False, related_name='follower_users')
+    
+class Follower(models.Model):
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following_set')
+    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers_set')
 
+    class Meta:
+        unique_together = ('follower', 'following')
     
 class Material(models.Model):
     id = models.AutoField(primary_key=True)

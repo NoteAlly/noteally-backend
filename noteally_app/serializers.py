@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from noteally_app.models import Material, User, StudyArea, Download, Like, University 
+from noteally_app.models import Material, User, StudyArea, Download, Like, University, Follower
 
 
 # ------------------------------ User Serializers ------------------------------
@@ -9,7 +9,18 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__' 
         depth = 2
+        
+class SubsUserSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = '__all__' 
+        depth = 1
 
+class FollowerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Follower
+        fields = '__all__'
 
 class UserMaterialIDSerializer(serializers.ModelSerializer):
     
