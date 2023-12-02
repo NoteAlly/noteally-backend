@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from noteally_app.CustomPagination import CustomPagination
-from noteally_app.serializers import UserSerializer, FollowerSerializer
+from noteally_app.serializers import SubsUserSerializer, FollowerSerializer
 from noteally_app.models import User, Follower
 from noteally_app.webservices.ws_auth import get_cognito_user
 
@@ -46,24 +46,50 @@ def subscribe(request, user_id):
     return Response({'message': 'Successfully subscribed'}, status=status.HTTP_201_CREATED)
 
 @api_view(['GET']) 
-def get_subscribers(request):
+def get_subscriptions(request):
     user = User.objects.get(id=request.headers['user'])
-    subscribers = user.followers.all() 
-    print("\n\n")
-    print(subscribers)
-    print("\n\n")
-    serializer = FollowerSerializer(subscribers, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    users = user.followers.all()  
+    
+    # Filtering
+    if "karma_score" in request.GET:
+        users = users.filter(karma_score__gte=request.GET["karma_score"]) 
 
-@api_view(['GET']) 
-def get_subscribed_to(request):
-    user = User.objects.get(id=request.headers['user'])
-    subscribers = user.followers_set.all() 
-    print("\n\n")
-    print(subscribers)
-    print("\n\n")
-    serializer = FollowerSerializer(subscribers, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    if "study_areas" in request.GET:
+        study_areas = request.GET.getlist("study_areas")
+        users = users.filter(study_areas__in=study_areas)
+        
+    if "name" in request.GET:
+        names = request.GET["name"].strip().split(" ")
+        if len(names) != 0:
+            if len(names) == 1:
+                users = users.filter(first_name__icontains=names[0]) | users.filter(last_name__icontains=names[0])
+            else:
+                users = users.filter(first_name__icontains=names[0], last_name__icontains=names[1])
+
+
+    # Ordering
+    order_options = ["first_name", "-first_name", "last_name", "-last_name", "karma_score", "-karma_score"]
+
+    if "order_by" in request.GET and request.GET["order_by"] in order_options:
+        users = users.order_by(request.GET["order_by"])
+    else:
+        users = users.order_by('-karma_score', 'first_name')
+
+    paginator = CustomPagination()  # Use your custom pagination class
+    paginated_users = paginator.paginate_queryset(users, request)
+    serializer = SubsUserSerializer(paginated_users, many=True)
+    paginated_response = paginator.get_paginated_response(serializer.data)
+
+    return Response(paginated_response.data, status=status.HTTP_200_OK)
+     
+
+
+# Used to get a list of the users subscribed to "user_id" user
+def get_subscribers(user_id):
+    user = User.objects.get(id=user_id)
+    subscribers = user.followers_set.all()  
+    
+    return subscribers
 
 
 
