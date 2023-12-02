@@ -45,25 +45,8 @@ def subscribe(request, user_id):
 @api_view(['GET']) 
 def get_subscriptions(request):
     user = User.objects.get(id=request.headers['User-id'])
-    users = user.followers.all()  
+    users = user.followers.all()   
     
-    # Filtering
-    if "karma_score" in request.GET:
-        users = users.filter(karma_score__gte=request.GET["karma_score"]) 
-
-    if "study_areas" in request.GET:
-        study_areas = request.GET.getlist("study_areas")
-        users = users.filter(study_areas__in=study_areas)
-        
-    if "name" in request.GET:
-        names = request.GET["name"].strip().split(" ")
-        if len(names) != 0:
-            if len(names) == 1:
-                users = users.filter(first_name__icontains=names[0]) | users.filter(last_name__icontains=names[0])
-            else:
-                users = users.filter(first_name__icontains=names[0], last_name__icontains=names[1])
-
-
     # Ordering
     order_options = ["first_name", "-first_name", "last_name", "-last_name", "karma_score", "-karma_score"]
 
@@ -85,10 +68,7 @@ def unsubscribe(request, user_id):
     try:
         user_to_unsubscribe = User.objects.get(id=user_id)
     except User.DoesNotExist:
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
-    if user_to_unsubscribe == user:
-        return Response({'error': 'Cannot unsubscribe yourself'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND) 
 
     # Check if the user is currently following
     try:
