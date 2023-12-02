@@ -29,7 +29,7 @@ def unlock_premium(request):
 def subscribe(request, user_id): 
     try:
         user_to_follow = User.objects.get(id=user_id)
-        user = User.objects.get(id=request.headers['user'])
+        user = User.objects.get(id=request.headers['User-id'])
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -47,7 +47,7 @@ def subscribe(request, user_id):
 
 @api_view(['GET']) 
 def get_subscriptions(request):
-    user = User.objects.get(id=request.headers['user'])
+    user = User.objects.get(id=request.headers['User-id'])
     users = user.followers.all()  
     
     # Filtering
