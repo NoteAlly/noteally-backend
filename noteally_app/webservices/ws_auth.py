@@ -91,9 +91,19 @@ def update_profile(request):
     
     user = User.objects.get(id=user_id)
     user.description = new_data["description"]
-    user.study_areas.set(new_data["study_areas"]) 
+    user.study_areas.set(new_data["study_areas"])
+    
+    if 'profile_picture' in request.FILES:
+        profile_picture = request.FILES['profile_picture']
+        user.profile_picture = str(uuid.uuid4()) + '.' + profile_picture.name.split('.')[-1]
+        # Save the profile picture
+        with open(user.profile_picture.path, 'wb') as f:
+            for chunk in profile_picture.chunks():
+                f.write(chunk)
+
     user.save()
     
+ 
     # Success Response
     user_data = {
         'id': user.id,
