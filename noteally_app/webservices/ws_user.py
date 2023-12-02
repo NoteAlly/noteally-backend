@@ -79,16 +79,7 @@ def unsubscribe(request, user_id):
     # Remove the follower relationship
     follower_relation.delete()
 
-    return Response({'message': 'Successfully unsubscribed'}, status=status.HTTP_200_OK)
-
-# Used to get a list of the users subscribed to "user_id" user
-def get_subscribers(user_id):
-    user = User.objects.get(id=user_id)
-    subscribers = user.followers_set.all()  
-    
-    return subscribers
-
-
+    return Response({'message': 'Successfully unsubscribed'}, status=status.HTTP_200_OK)  
 
 @api_view(['POST'])
 def handle(request):
