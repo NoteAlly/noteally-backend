@@ -5,7 +5,9 @@ from noteally_app.CustomPagination import CustomPagination
 from noteally_app.serializers import SubsUserSerializer, FollowerSerializer
 from noteally_app.models import User, Follower
 from noteally_app.webservices.ws_auth import get_cognito_user
-
+import boto3
+from botocore.client import Config
+from django.conf import settings
 
 def unlock_premium(request):
     # Get user from database or return error if not found
@@ -42,6 +44,35 @@ def subscribe(request, user_id):
 
     # Create a new follower relationship
     Follower.objects.create(follower=user, following=user_to_follow)
+
+    # Subscribe the user to the SNS topic of the user to follow
+    if not user_to_follow.sns_topic_arn:
+        topic_name = f'uploads-user-{user_to_follow.id}'
+    else:
+        topic_name = user_to_follow.sns_topic_arn.split(':')[-1]
+    
+    # Create a new SNS topic for the user if it doesn't exist
+    topic_arn = f'arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:{topic_name}'
+
+    # Presigned URL - SNS
+    sns_client = boto3.client(
+        service_name='sns',
+        region_name=settings.AWS_REGION_NAME,
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        topic_arn=topic_arn,
+        config=Config(signature_version='s3v4')
+    )
+
+    try:
+        sns_client.subscribe(
+            TopicArn=topic_arn,
+            Protocol='email',  
+            Endpoint=request.user.email  
+        )
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
     return Response({'message': 'Successfully subscribed'}, status=status.HTTP_201_CREATED)
 
