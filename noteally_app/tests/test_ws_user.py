@@ -156,7 +156,7 @@ class TestUserView(APITestCase):
         self.assertEqual(response.data, expected_response)
 
     def test_get_subscriptions(self):
-        url = reverse('get_subscribers')
+        url = reverse('get_subscriptions')
         headers = {'User-id': self.user1.id}
 
         response = self.client.get(url, headers=headers) 
