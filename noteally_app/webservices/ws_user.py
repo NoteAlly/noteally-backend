@@ -82,7 +82,27 @@ def get_subscriptions(request):
 
     return Response(paginated_response.data, status=status.HTTP_200_OK)
      
+@api_view(['POST']) 
+def unsubscribe(request, user_id):
+    user = User.objects.get(id=request.headers['User-id'])
+    try:
+        user_to_unsubscribe = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
+    if user_to_unsubscribe == user:
+        return Response({'error': 'Cannot unsubscribe yourself'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check if the user is currently following
+    try:
+        follower_relation = Follower.objects.get(follower=user, following=user_to_unsubscribe)
+    except Follower.DoesNotExist:
+        return Response({'error': 'Not currently subscribed to this user'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Remove the follower relationship
+    follower_relation.delete()
+
+    return Response({'message': 'Successfully unsubscribed'}, status=status.HTTP_200_OK)
 
 # Used to get a list of the users subscribed to "user_id" user
 def get_subscribers(user_id):

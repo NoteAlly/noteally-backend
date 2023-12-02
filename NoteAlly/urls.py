@@ -39,6 +39,7 @@ urlpatterns = [
     path('posts/<int:material_id>', ws_posts.handle_id, name="posts_id"),
     path('unlock_premium/', ws_user.handle, name="unlock_premium"),
     path('subscribe/<int:user_id>/', ws_user.subscribe, name='subscribe'),
+    path('unsubscribe/<int:user_id>/', ws_user.unsubscribe, name='unsubscribe'),
     path('get_subscriptions/', ws_user.get_subscriptions, name='get_subscriptions'), 
 ]
 
