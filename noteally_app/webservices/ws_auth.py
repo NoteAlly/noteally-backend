@@ -9,7 +9,6 @@ from noteally_app.decorators import get_cognito_user
 def authenticate(request):
     auth_data = request.data
     access_token = auth_data['access_token']
-    id_token = auth_data['id_token']
     cognito_user = get_cognito_user(access_token)
 
     if cognito_user is None:
@@ -32,7 +31,7 @@ def authenticate(request):
     user_data = {
         'id': user.id,
         'sub': user.sub,
-        'id_token': access_token,  #TODO: change dict key to access_token
+        'id_token': access_token,
         'first_name': user.first_name,
         'last_name': user.last_name,
         'email': user.email,
