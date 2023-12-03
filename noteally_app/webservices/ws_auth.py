@@ -4,7 +4,7 @@ from django.conf import settings
 from noteally_app.models import User
 from noteally_app.serializers import UserSessionSerializer
 import requests
-
+import uuid
 
 def get_cognito_user(access_token):
     cognito_domain = settings.COGNITO_DOMAIN

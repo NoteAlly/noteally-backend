@@ -32,10 +32,10 @@ def post_materials(request):
         subscribers = user.followers_set.all()  
 
         # Create topic for user if it doesn't exist
-        if not request.user.sns_topic_arn:
-            topic_name = f'uploads-user-{request.user.id}'
-        else: 
-            topic_name = request.user.sns_topic_arn.split(':')[-1]
+        #if not user.sns_topic_arn:
+        topic_name = f'uploads-user-{user.id}'
+        #else: 
+        #    topic_name = user.sns_topic_arn.split(':')[-1]
 
         # Publish message to SNS topic for each subscriber
         topic_arn = f'arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:{topic_name}'
@@ -46,24 +46,26 @@ def post_materials(request):
             region_name=settings.AWS_REGION_NAME,
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-            topic_arn=topic_arn,
             config=Config(signature_version='s3v4')
         )
 
         # Create a message to publish
-        message = f"New material posted by {user.username} with title {object_.title}"  # Adjust the message as needed
+        message = f"New material posted by {user.first_name} {user.last_name} with title {serializer.validated_data['file'].name}"  # Adjust the message as needed
 
-        for subscriber in subscribers:
-            try:
-                sns_client.publish(
-                    TopicArn=topic_arn,
-                    Message=message,
-                    Subject='New Material from {user.username}',
-                    MessageStructure='string'
-                )
-            except Exception as e:
-                print(f"Failed to publish message to {subscriber.username}: {str(e)}")
+        # Create a subject for the message
+        subject = f"New material posted by {user.first_name} {user.last_name}"  # Adjust the subject as needed
         
+        # Publish message to SNS in the topic 
+        try:
+            sns_client.publish(
+                TopicArn=topic_arn,
+                Message=message,
+                Subject=subject,
+                MessageStructure='string'
+            )
+        except Exception as e:
+            print(f"Failed to publish message to subscribers: {str(e)}")
+    
         return Response({"Success": "Successfully Created", "created_id": object_.id}, status=status.HTTP_201_CREATED)
         
     return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST) 

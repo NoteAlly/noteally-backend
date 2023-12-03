@@ -43,10 +43,10 @@ def subscribe(request, user_id):
     Follower.objects.create(follower=user, following=user_to_follow)
 
     # Subscribe the user to the SNS topic of the user to follow
-    if not user_to_follow.sns_topic_arn:
-        topic_name = f'uploads-user-{user_to_follow.id}'
-    else:
-        topic_name = user_to_follow.sns_topic_arn.split(':')[-1]
+    #if not user_to_follow.sns_topic_arn:
+    topic_name = f'uploads-user-{user_to_follow.id}'
+    #else:
+    #    topic_name = user_to_follow.sns_topic_arn.split(':')[-1]
     
     # Create a new SNS topic for the user if it doesn't exist
     topic_arn = f'arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:{topic_name}'
@@ -57,15 +57,21 @@ def subscribe(request, user_id):
         region_name=settings.AWS_REGION_NAME,
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        topic_arn=topic_arn,
         config=Config(signature_version='s3v4')
     )
 
+    # Create a new topic for the user to follow if it doesn't exist
+    try:
+        sns_client.create_topic(Name=topic_name)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Subscribe the user to the topic
     try:
         sns_client.subscribe(
             TopicArn=topic_arn,
             Protocol='email',  
-            Endpoint=request.user.email  
+            Endpoint=user.email  
         )
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

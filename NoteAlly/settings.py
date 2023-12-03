@@ -17,6 +17,7 @@ SECRET_KEY = os.environ.get("DJANGO_KEY")
 # ENV. VARIABLES
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_ACCOUNT_ID = os.environ.get('AWS_ACCOUNT_ID')
 AWS_REGION_NAME = os.environ.get('AWS_REGION_NAME')
 
 AWS_S3_BUCKET_NAME = os.environ.get('AWS_S3_BUCKET_NAME')
