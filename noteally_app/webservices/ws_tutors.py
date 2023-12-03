@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
+from noteally_app.decorators import cognito_login_required
 from rest_framework.response import Response
 from noteally_app.CustomPagination import CustomPagination
 from noteally_app.serializers import UserSerializer
@@ -57,6 +58,7 @@ def get_tutors_id(request, tutors_id):
 
 
 @api_view(['GET'])
+@cognito_login_required
 def handle(request):
     if request.method == 'GET':
         return get_tutors(request)
@@ -64,6 +66,7 @@ def handle(request):
    
    
 @api_view(['GET'])
+@cognito_login_required
 def handle_id(request, tutors_id):
     if request.method == 'GET':
         return get_tutors_id(request, tutors_id)

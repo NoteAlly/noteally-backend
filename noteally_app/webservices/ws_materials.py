@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
+from noteally_app.decorators import cognito_login_required
 from rest_framework.response import Response
 from noteally_app.CustomPagination import CustomPagination
 from noteally_app.serializers import MaterialIDSerializer, PostMaterialSerializer, MaterialSerializer
@@ -117,6 +118,7 @@ def get_materials_id(request, material_id):
 
 
 @api_view(['GET', 'POST'])
+@cognito_login_required
 def handle(request):
     if request.method == 'POST':
         return post_materials(request)
@@ -125,6 +127,7 @@ def handle(request):
    
    
 @api_view(['GET', 'PUT', 'DELETE'])
+@cognito_login_required
 def handle_id(request, material_id):
     if request.method == 'GET':
         return get_materials_id(request, material_id)

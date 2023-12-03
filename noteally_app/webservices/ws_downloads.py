@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
+from noteally_app.decorators import cognito_login_required
 from rest_framework.response import Response
 from noteally_app.models import Material, Download, User
 from noteally_app.serializers import MaterialSerializer
@@ -68,12 +69,14 @@ def get_downloads(request):
 
 
 @api_view(['GET'])
+@cognito_login_required
 def handle(request):
     if request.method == 'GET':
         return get_downloads(request)
         
    
 @api_view(['GET'])
+@cognito_login_required
 def handle_id(request, material_id):
     if request.method == 'GET':
         return get_materials_id_download(request, material_id)

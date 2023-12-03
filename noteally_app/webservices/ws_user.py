@@ -1,10 +1,10 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
+from noteally_app.decorators import cognito_login_required
 from rest_framework.response import Response
 from noteally_app.CustomPagination import CustomPagination
 from noteally_app.serializers import SubsUserSerializer, FollowerSerializer
 from noteally_app.models import User, Follower
-from noteally_app.webservices.ws_auth import get_cognito_user
 
 
 def unlock_premium(request):
@@ -25,7 +25,9 @@ def unlock_premium(request):
     
     return Response({'user_id': user.id, 'message': 'Premium unlocked'}, status=status.HTTP_200_OK)
 
-@api_view(['POST']) 
+
+@api_view(['POST'])
+@cognito_login_required
 def subscribe(request, user_id): 
     try:
         user_to_follow = User.objects.get(id=user_id)
@@ -42,7 +44,9 @@ def subscribe(request, user_id):
 
     return Response({'message': 'Successfully subscribed'}, status=status.HTTP_201_CREATED)
 
-@api_view(['GET']) 
+
+@api_view(['GET'])
+@cognito_login_required 
 def get_subscriptions(request):
     user = User.objects.get(id=request.headers['User-id'])
     users = user.followers.all()   
@@ -61,8 +65,10 @@ def get_subscriptions(request):
     paginated_response = paginator.get_paginated_response(serializer.data)
 
     return Response(paginated_response.data, status=status.HTTP_200_OK)
-     
-@api_view(['POST']) 
+    
+
+@api_view(['POST'])
+@cognito_login_required
 def unsubscribe(request, user_id):
     user = User.objects.get(id=request.headers['User-id'])
     try:
@@ -81,7 +87,9 @@ def unsubscribe(request, user_id):
 
     return Response({'message': 'Successfully unsubscribed'}, status=status.HTTP_200_OK)  
 
+
 @api_view(['POST'])
+@cognito_login_required
 def handle(request):
     if request.method == 'POST':
         return unlock_premium(request)

@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
+from noteally_app.decorators import cognito_login_required
 from rest_framework.response import Response
 from noteally_app.models import Material, User, Like
 
@@ -102,6 +103,7 @@ def delete(request, material_id):
 
 
 @api_view(['POST', 'DELETE'])
+@cognito_login_required
 def handle_like(request, material_id):
     if request.method == 'POST':
         return like(request, material_id)
@@ -110,6 +112,7 @@ def handle_like(request, material_id):
 
 
 @api_view(['POST', 'DELETE'])
+@cognito_login_required
 def handle_dislike(request, material_id):
     if request.method == 'POST':
         return dislike(request, material_id)
