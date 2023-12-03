@@ -3,6 +3,7 @@ from .settings import * #NOSONAR
 
 DEBUG = False
 
+CORS_ORIGIN_ALLOW_ALL = True
 
 DATABASES = {
     'default': {

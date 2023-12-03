@@ -1,4 +1,3 @@
-# Load the rest framework libraries
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -15,8 +14,7 @@ def get_info():
     study_areas = StudyArea.objects.all()
     serializer = InfoSerializer({"universities": universities, "study_areas": study_areas})
 
-    return Response(serializer.data)
-
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def handle(request):

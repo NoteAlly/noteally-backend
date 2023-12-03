@@ -1,8 +1,5 @@
 from rest_framework.test import APITestCase
-from unittest import mock
-from django.core.files import File
 from django.urls import reverse
-from noteally_app.tests.fill_db import fill_db
 from noteally_app.models import StudyArea, University
 
 
@@ -31,4 +28,3 @@ class TestMaterialsView(APITestCase):
         # Assert the response data
         self.assertEquals(len(response.data['universities']), 2)
         self.assertEquals(len(response.data['study_areas']), 5)
-

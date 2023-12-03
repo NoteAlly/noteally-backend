@@ -6,7 +6,7 @@ from noteally_app.webservices.ws_auth import get_cognito_user
 from noteally_app.models import StudyArea
 
 
-@patch('noteally_app.webservices.ws_auth.requests')
+@patch('noteally_app.decorators.requests')
 class TestAuthView(APITestCase):
     
     def setUp(self):
