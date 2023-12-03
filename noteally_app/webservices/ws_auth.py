@@ -91,7 +91,7 @@ def update_profile(request):
     
     user = User.objects.get(id=user_id)
     user.description = new_data["description"]
-    user.study_areas.set(new_data["study_areas"])
+    user.study_areas.set(new_data.getlist("study_areas"))
     
     if 'profile_picture' in request.FILES:
         profile_picture = request.FILES['profile_picture']

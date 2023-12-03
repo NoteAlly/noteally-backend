@@ -27,22 +27,9 @@ def unlock_premium(request):
     
     return Response({'user_id': user.id, 'message': 'Premium unlocked'}, status=status.HTTP_200_OK)
 
-@api_view(['POST']) 
-def subscribe(request, user_id): 
-    try:
-        user_to_follow = User.objects.get(id=user_id)
-        user = User.objects.get(id=request.headers['User-id'])
-    except User.DoesNotExist:
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND) 
-
-    # Check if the user is already following
-    if Follower.objects.filter(follower=user, following=user_to_follow).exists():
-        return Response({'error': 'Already following this user'}, status=status.HTTP_400_BAD_REQUEST)
-
-    # Create a new follower relationship
-    Follower.objects.create(follower=user, following=user_to_follow)
-
-    # Subscribe the user to the SNS topic of the user to follow
+# Subscribe the user to the SNS topic to allow notifications of new uploads
+def subscribe_to_sns_topic(user, user_to_follow):
+    # TODO: add sns_topic_arn to the database
     #if not user_to_follow.sns_topic_arn:
     topic_name = f'uploads-user-{user_to_follow.id}'
     #else:
@@ -76,6 +63,23 @@ def subscribe(request, user_id):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['POST']) 
+def subscribe(request, user_id): 
+    try:
+        user_to_follow = User.objects.get(id=user_id)
+        user = User.objects.get(id=request.headers['User-id'])
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND) 
+
+    # Check if the user is already following
+    if Follower.objects.filter(follower=user, following=user_to_follow).exists():
+        return Response({'error': 'Already following this user'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Create a new follower relationship
+    Follower.objects.create(follower=user, following=user_to_follow)
+
+    # Subscribe the user to the SNS topic of the user to follow
+    subscribe_to_sns_topic(user, user_to_follow)
 
     return Response({'message': 'Successfully subscribed'}, status=status.HTTP_201_CREATED)
 

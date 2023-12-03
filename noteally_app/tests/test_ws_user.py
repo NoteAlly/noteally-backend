@@ -3,6 +3,7 @@ from django.urls import reverse
 from noteally_app.tests.fill_db import fill_db
 from django.db.models import Max
 from noteally_app.models import User, Follower
+from unittest.mock import patch, MagicMock
 
 # import ErrorDetail in the line below
 from rest_framework.exceptions import ErrorDetail
@@ -163,6 +164,27 @@ class TestUserView(APITestCase):
 
         # Assert the response status code
         self.assertEqual(response.status_code, 200)
+    
+    '''
+    @patch('noteally_app.webservices.ws_user.boto3')
+    def test_user_sns_topic_creation(self, mock_boto3):
+        # mock response from boto3
+        mock_boto3.client.return_value = MagicMock()
+        mock_boto3.client.return_value.create_topic.return_value = {'TopicArn': 'test_topic_arn'}
+
+        # Subscribe the user to the SNS topic to allow notifications of new uploads
+        topic_name = f'uploads-user-{self.user_to_follow.id}'
+        topic_arn = f'arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:{topic_name}'
+
+        response = subscribe_to_sns_topic(self.user, self.user_to_follow)
+
+        # Assert the response status code
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the topic creation
+        mock_boto3.client.create_topic.assert_called_once_with(Name=topic_name)
+    '''
+        
  
         
         
