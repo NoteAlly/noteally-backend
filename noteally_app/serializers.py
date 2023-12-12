@@ -9,6 +9,10 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__' 
         depth = 2
+
+class UpdateUserSerializer(serializers.Serializer):
+    description = serializers.CharField(max_length=2000)
+    study_areas = serializers.ListField(child=serializers.IntegerField())
         
 class SubsUserSerializer(serializers.ModelSerializer):
     

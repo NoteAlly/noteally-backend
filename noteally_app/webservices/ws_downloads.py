@@ -25,7 +25,7 @@ def get_materials_id_download(request, material_id):
             config=Config(signature_version='s3v4')
         )
 
-        bucket_name = settings.AWS_S3_BUCKET_NAME
+        bucket_name = settings.AWS_S3_PRIVATE_BUCKET_NAME
         key = material.file.name
 
         url = s3.generate_presigned_url(
