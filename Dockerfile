@@ -41,4 +41,5 @@ CMD echo "DJANGO_KEY=$DJANGO_KEY" >> .env; \
     echo "DB_HOST=$DB_HOST" >> .env; \
     python3 manage.py makemigrations --settings=NoteAlly.production_settings; \
     python3 manage.py migrate --run-syncdb --settings=NoteAlly.production_settings; \
+    python3 manage.py populate --settings=NoteAlly.production_settings; \
     python manage.py runserver 0.0.0.0:8000 --settings=NoteAlly.production_settings
