@@ -1,0 +1,38 @@
+General Medicine
+Internal Medicine Specialties
+Diagnostic Specialties
+Interdisciplinary Medicine
+Public Health
+Surgery
+Agricultural Sciences
+Biochemistry
+Cell Biology
+Environment & Ecology
+Evolutionary & Developmental Biology
+Interdisciplinary Biology
+Microbiology
+Molecular Biology & Genetics
+Neuroscience
+Pharmacology & Toxicology
+Zoology & Plant Biology
+Veterinary Medicine
+Communication
+Education
+Arts & Humanities
+Public Policy
+Economics
+Political Science
+Information Management
+Social & Behavioral Sciences
+Business
+Law
+Chemistry
+Physics
+Space Science
+Earth Science
+Paleontology
+Engineering
+Materials Science
+Computer Science
+Mathematics
+Statistics

@@ -2,35 +2,14 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.conf import settings
 from noteally_app.models import User
-from noteally_app.serializers import UserSessionSerializer
-import requests
+from noteally_app.serializers import UserSessionSerializer, UpdateUserSerializer
+from noteally_app.decorators import get_cognito_user
 import uuid
-
-def get_cognito_user(access_token):
-    cognito_domain = settings.COGNITO_DOMAIN
-    url = f'https://{cognito_domain}/oauth2/userInfo'
-    headers = {'Authorization': f'Bearer {access_token}'}
-
-    response = requests.get(url, headers=headers)
-    response_data = response.json()
-
-    if response.status_code == 200:
-        cognito_user = {
-            'sub': response_data['sub'],
-            'email_verified': response_data['email_verified'],
-            'first_name': response_data['given_name'],
-            'last_name': response_data['family_name'],
-            'email': response_data['email'],
-            'username': response_data['username']
-        }
-        return cognito_user
-    return None
 
 
 def authenticate(request):
     auth_data = request.data
     access_token = auth_data['access_token']
-    id_token = auth_data['id_token']
     cognito_user = get_cognito_user(access_token)
 
     if cognito_user is None:
@@ -53,7 +32,7 @@ def authenticate(request):
     user_data = {
         'id': user.id,
         'sub': user.sub,
-        'id_token': id_token,
+        'id_token': access_token,
         'first_name': user.first_name,
         'last_name': user.last_name,
         'email': user.email,
@@ -76,50 +55,50 @@ def handle(request):
     
 @api_view(['POST'])
 def update_profile(request):
-    
-    # Handle Data and possible errors
-    new_data = request.data
-    user_id = new_data['id']  
-    id_token = new_data['id']  
+    user_id = request.headers['User-id']
+    user_access_token = request.headers['Authorization'].split(' ')[1]
+    data = request.data
+
     user_in_db = User.objects.filter(id=user_id).count() == 1
     registered = True
 
     if not user_in_db:
         return Response({'error': 'User not in database'}, status=400)
-
-    # Update User Info with new data
     
     user = User.objects.get(id=user_id)
-    user.description = new_data["description"]
-    user.study_areas.set(new_data.getlist("study_areas"))
+    serializer = UpdateUserSerializer(data=data)
+
+    if serializer.is_valid():
+        user.description = serializer.validated_data['description']
+        user.study_areas.set(serializer.validated_data['study_areas'])
+        user.save()
+    else:
+        return Response({'error': 'Invalid data'}, status=400)
     
     if 'profile_picture' in request.FILES:
         profile_picture = request.FILES['profile_picture']
-        user.profile_picture = str(uuid.uuid4()) + '.' + profile_picture.name.split('.')[-1]
-        # Save the profile picture
-        with open(user.profile_picture.path, 'wb') as f:
-            for chunk in profile_picture.chunks():
-                f.write(chunk)
+        profile_picture.name = str(uuid.uuid4()) + '.' + profile_picture.name.split('.')[-1]
+        user.profile_picture_name = profile_picture.name
+        user.profile_pic_size = profile_picture.size
+        user.profile_picture = profile_picture
+        user.save()
 
-    user.save()
-    
- 
     # Success Response
     user_data = {
         'id': user.id,
         'sub': user.sub,
-        'id_token': id_token,
+        'id_token': user_access_token,
         'first_name': user.first_name,
         'last_name': user.last_name,
         'email': user.email,
         'premium': user.premium,
-        'karma_score': user.karma_score,
+        'karma_score': user.karma_score,    
         'tutoring_services': user.tutoring_services,
         'profile_picture': user.profile_picture,
         'study_areas': user.study_areas,
         'description': user.description,
         'registered': registered
     }
+
     session_serializer = UserSessionSerializer(user_data)
     return Response(session_serializer.data, status=200)
-

@@ -30,15 +30,6 @@ class TestDownloadsView(APITestCase):
         self.assertEqual(response.data, expected_response)
 
 
-    def test_get_posts_invalid(self):
-        url = reverse('posts')
-        response = self.client.get(url)
-        expected_response = {'error': 'Error while getting posts'}
-
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, expected_response)
-
-
     def test_delete_post(self):
         headers = {'User-id': self.user1.id}
         url = reverse('posts_id', kwargs={'material_id': self.material1.id})

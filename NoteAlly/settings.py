@@ -20,8 +20,8 @@ AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_ACCOUNT_ID = os.environ.get('AWS_ACCOUNT_ID')
 AWS_REGION_NAME = os.environ.get('AWS_REGION_NAME')
 
-AWS_S3_BUCKET_NAME = os.environ.get('AWS_S3_BUCKET_NAME')
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_S3_BUCKET_NAME}.s3.amazonaws.com'
+AWS_S3_PRIVATE_BUCKET_NAME = os.environ.get('AWS_S3_PRIVATE_BUCKET_NAME')
+AWS_S3_PUBLIC_BUCKET_NAME = os.environ.get('AWS_S3_PUBLIC_BUCKET_NAME')
 AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 
 DB_NAME = os.environ.get("DB_NAME")
@@ -139,6 +139,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
+
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 STORAGES = {}
 

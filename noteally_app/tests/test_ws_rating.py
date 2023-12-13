@@ -121,7 +121,7 @@ class TestMaterialsView(APITestCase):
     def test_unlike(self):
         # add like
         url = reverse('like', kwargs={'material_id': self.material2.id})
-        response = self.client.post(url, headers=self.header)
+        self.client.post(url, headers=self.header)
 
         # get karma score, likes and dislikes
         karma_score = User.objects.get(id=self.user1.id).karma_score
@@ -193,7 +193,7 @@ class TestMaterialsView(APITestCase):
     def test_dislike_already_disliked(self):
         # add dislike
         url = reverse('dislike', kwargs={'material_id': self.material2.id})
-        response = self.client.post(url, headers=self.header)
+        self.client.post(url, headers=self.header)
 
         # get karma score, likes and dislikes
         karma_score = User.objects.get(id=self.user1.id).karma_score
@@ -237,7 +237,7 @@ class TestMaterialsView(APITestCase):
     def test_undislike(self):
         # add dislike
         url = reverse('dislike', kwargs={'material_id': self.material2.id})
-        response = self.client.post(url, headers=self.header)
+        self.client.post(url, headers=self.header)
 
         # get karma score, likes and dislikes
         karma_score = User.objects.get(id=self.user1.id).karma_score

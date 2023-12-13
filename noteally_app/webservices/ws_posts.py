@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
+from noteally_app.decorators import cognito_login_required
 from rest_framework.response import Response
 from noteally_app.serializers import MaterialSerializer
 from noteally_app.models import Material, User
@@ -48,16 +49,19 @@ def delete_post(request, material_id):
 
 
 @api_view(['GET'])
+@cognito_login_required
 def handle(request):
     if request.method == 'GET':
         return get_posts(request)
     
 @api_view(['DELETE'])
+@cognito_login_required
 def handle_id(request, material_id):
     if request.method == 'DELETE':
         return delete_post(request, material_id)
     
 @api_view(['GET'])
+@cognito_login_required
 def handle_user_id(request, user_id):
     if request.method == 'GET':
         return get_posts_by_user(request, user_id)

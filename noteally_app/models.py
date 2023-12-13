@@ -1,5 +1,7 @@
 from django.db import models
 from django.db import models
+from storages.backends.s3 import S3Storage
+from django.conf import settings
 
 
 class StudyArea(models.Model):
@@ -10,8 +12,6 @@ class StudyArea(models.Model):
 class University(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-
-
 
 
 class User(models.Model):
@@ -27,9 +27,14 @@ class User(models.Model):
     tutoring_services = models.BooleanField(default=False)
     profile_picture_name = models.CharField(max_length=100, blank=True)
     profile_pic_size = models.IntegerField(default=0)
-    profile_picture = models.FileField(upload_to='profile_pictures/', blank=True)
+
+    if settings.SETTINGS_MODULE == 'NoteAlly.production_settings':                
+        profile_picture = models.FileField(upload_to='profile_pictures/', blank=True, storage=S3Storage(bucket_name='noteally-public-bucket', default_acl='public-read', querystring_auth=False))
+    else:
+        profile_picture = models.FileField(upload_to='profile_pictures/', blank=True)
+    
     followers = models.ManyToManyField('self', through="Follower", through_fields=('follower', 'following'), symmetrical=False, related_name='following_users')
-    #followings = models.ManyToManyField('self', through="Follower", symmetrical=False, related_name='follower_users')
+    
     
 class Follower(models.Model):
     follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following_set')
@@ -48,7 +53,11 @@ class Material(models.Model):
     university = models.ForeignKey(University, on_delete=models.DO_NOTHING)
     file_name = models.CharField(max_length=100, blank=True)
     file_size = models.IntegerField(default=0)
-    file = models.FileField(upload_to='materials/', blank=True)
+
+    if settings.SETTINGS_MODULE == 'NoteAlly.production_settings':
+        file = models.FileField(upload_to='materials/', blank=True, storage=S3Storage(bucket_name='noteally-bucket'))
+    else:
+        file = models.FileField(upload_to='materials/', blank=True)
     study_areas = models.ManyToManyField(StudyArea)
     total_likes = models.IntegerField(default=0)
     total_dislikes = models.IntegerField(default=0)
