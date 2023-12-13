@@ -32,7 +32,7 @@ def notify_subscribers(serializer, user):
     )
 
     # Create a message to publish
-    message = f"New material posted by {user.first_name} {user.last_name} with title {serializer.validated_data['file'].name}"  # Adjust the message as needed
+    message = f"New material posted by {user.first_name} {user.last_name} with title {serializer.name}"  # Adjust the message as needed
     print(f"Message: {message}")
 
     # Create a subject for the message
