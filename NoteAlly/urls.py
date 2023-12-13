@@ -1,12 +1,11 @@
 from django.contrib import admin
 from django.urls import path
 from django.conf import settings
-from noteally_app.webservices import ws_info, ws_materials, ws_tutors, ws_rating, ws_test, ws_auth, ws_downloads, ws_posts, ws_user
+from noteally_app.webservices import ws_info, ws_materials, ws_tutors, ws_rating, ws_auth, ws_downloads, ws_posts, ws_user
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('info/', ws_info.handle, name="info"),
-    path('populate/', ws_test.populate_db, name="populate"),
     path('login/', ws_auth.handle, name="login"),
     path('update_profile/', ws_auth.update_profile, name="update_profile"),
     path('materials/', ws_materials.handle, name="materials"),

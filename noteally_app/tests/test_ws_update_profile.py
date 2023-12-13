@@ -5,6 +5,7 @@ from django.core.files import File
 from noteally_app.tests.fill_db import fill_db
 from noteally_app.models import Material
 from django.db.models import Max
+import shutil
 
 
 class TestAuthView(APITestCase):
@@ -12,6 +13,10 @@ class TestAuthView(APITestCase):
     def setUp(self):
         self = fill_db(self)
         self.url = reverse('update_profile')
+
+
+    def tearDown(self):
+        shutil.rmtree('test_media', ignore_errors=True)
         
 
     def test_update_profile_success(self):
