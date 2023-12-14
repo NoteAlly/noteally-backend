@@ -9,7 +9,7 @@ class TestDownloadsView(APITestCase):
     
     def setUp(self):
         self = fill_db(self)
-        self.error_response = {'error': 'Error while downloading material'}
+        self.error_response = {'error': 'Error while getting posts'}
 
 
     def test_get_posts(self):
