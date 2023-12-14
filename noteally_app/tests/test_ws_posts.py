@@ -9,6 +9,7 @@ class TestDownloadsView(APITestCase):
     
     def setUp(self):
         self = fill_db(self)
+        self.error_response = {'error': 'Error while getting posts'}
 
 
     def test_get_posts(self):
@@ -24,10 +25,9 @@ class TestDownloadsView(APITestCase):
     def test_get_posts_invalid(self):
         url = reverse('posts')
         response = self.client.get(url)
-        expected_response = {'error': 'Error while getting posts'}
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, expected_response)
+        self.assertEqual(response.data, self.error_response)
 
 
     def test_delete_post(self):
@@ -57,10 +57,9 @@ class TestDownloadsView(APITestCase):
     def test_delete_post_invalid(self):
         url = reverse('posts_id', kwargs={'material_id': self.material1.id})
         response = self.client.delete(url)
-        expected_response = {'error': 'Error while getting posts'}
     
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, expected_response)
+        self.assertEqual(response.data, self.error_response)
 
     # get posts with valid user_id
     def test_get_posts_by_user(self):
@@ -74,7 +73,6 @@ class TestDownloadsView(APITestCase):
     def test_get_posts_by_user_invalid(self):
         url = reverse('posts_user_id', kwargs={'user_id': 999})  # Use an invalid user_id
         response = self.client.get(url)
-        expected_response = {'error': 'Error while getting posts'}
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, expected_response)
+        self.assertEqual(response.data, self.error_response)

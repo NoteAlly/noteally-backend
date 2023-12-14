@@ -6,13 +6,13 @@ from noteally_app.CustomPagination import CustomPagination
 from noteally_app.serializers import SubsUserSerializer, FollowerSerializer
 from noteally_app.models import User, Follower
 
+USER_NOT_FOUND_RESPONSE = {'error': 'User not found'}
 
 def unlock_premium(request):
-    # Get user from database or return error if not found
     try:
         user = User.objects.get(id=request.headers['User-id'])
     except User.DoesNotExist:
-        return Response({'error': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(USER_NOT_FOUND_RESPONSE, status=status.HTTP_400_BAD_REQUEST)
     except KeyError:
         return Response({'error': 'User-id header not found'}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -33,7 +33,7 @@ def subscribe(request, user_id):
         user_to_follow = User.objects.get(id=user_id)
         user = User.objects.get(id=request.headers['User-id'])
     except User.DoesNotExist:
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND) 
+        return Response(USER_NOT_FOUND_RESPONSE, status=status.HTTP_404_NOT_FOUND) 
 
     # Check if the user is already following
     if Follower.objects.filter(follower=user, following=user_to_follow).exists():

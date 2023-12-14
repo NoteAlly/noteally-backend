@@ -6,6 +6,7 @@ from noteally_app.models import Material, User, Like
 
 # How karma works: if like, +3 to author, if dislike, no change to author
 
+ERROR_RESPONSE = {'error': 'Material does not exist'}
 
 def like(request, material_id):
     try:
@@ -41,7 +42,7 @@ def like(request, material_id):
         return Response({"Success": "Successfully Liked"}, status=status.HTTP_200_OK)
         
     except Material.DoesNotExist:
-        return Response({'error': 'Material does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(ERROR_RESPONSE, status=status.HTTP_404_NOT_FOUND)
 
 
 def dislike(request, material_id):
@@ -74,7 +75,7 @@ def dislike(request, material_id):
         return Response({"Success": "Successfully Disliked"}, status=status.HTTP_200_OK)
     
     except Material.DoesNotExist:
-        return Response({'error': 'Material does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(ERROR_RESPONSE, status=status.HTTP_404_NOT_FOUND)
 
 
 def delete(request, material_id):
@@ -99,7 +100,7 @@ def delete(request, material_id):
         return Response({"Success": "Successfully deleted"}, status=status.HTTP_200_OK)
         
     except Material.DoesNotExist:
-        return Response({'error': 'Material does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(ERROR_RESPONSE, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST', 'DELETE'])
