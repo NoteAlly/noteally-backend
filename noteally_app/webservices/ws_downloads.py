@@ -49,7 +49,7 @@ def get_materials_id_download(request, material_id):
             material.save()
             download = Download(user=user, resource=material)
             download.save()
-    except:
+    except Exception as _:
         return Response({'error': 'Error while downloading material'}, status=status.HTTP_400_BAD_REQUEST)
     
     return Response({"name": material.file_name, "link": url}, status=status.HTTP_200_OK)
@@ -64,7 +64,7 @@ def get_downloads(request):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    except:
+    except Exception as _:
         return Response({'error': 'Error while getting downloads'}, status=status.HTTP_400_BAD_REQUEST)
 
 

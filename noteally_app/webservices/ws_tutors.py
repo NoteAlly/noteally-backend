@@ -43,7 +43,7 @@ def get_tutors(request):
 
     return Response(paginated_response.data, status=status.HTTP_200_OK)
 
-def get_tutors_id(request, tutors_id):
+def get_tutors_id(tutors_id):
     try: 
 
         user = User.objects.get(id=tutors_id) 
@@ -69,4 +69,4 @@ def handle(request):
 @cognito_login_required
 def handle_id(request, tutors_id):
     if request.method == 'GET':
-        return get_tutors_id(request, tutors_id)
+        return get_tutors_id(tutors_id)

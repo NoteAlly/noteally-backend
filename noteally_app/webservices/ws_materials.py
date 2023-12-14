@@ -28,7 +28,7 @@ def post_materials(request):
         object_ = serializer.save()
         
         #Notify all subscribers
-        subscribers = user.followers_set.all()  
+        user.followers_set.all()  
         
         return Response({"Success": "Successfully Created", "created_id": object_.id}, status=status.HTTP_201_CREATED)
         

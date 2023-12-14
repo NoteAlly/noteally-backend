@@ -13,6 +13,8 @@ class TestAuthView(APITestCase):
     def setUp(self):
         self = fill_db(self)
         self.url = reverse('update_profile')
+        self.user_bearer_token = 'Bearer 0123456789'
+        self.example_description = 'Updated description'
 
 
     def tearDown(self):
@@ -20,9 +22,9 @@ class TestAuthView(APITestCase):
         
 
     def test_update_profile_success(self):
-        headers = {'User-id': self.user1.id, 'Authorization': 'Bearer 0123456789'}
+        headers = {'User-id': self.user1.id, 'Authorization': self.user_bearer_token}
         data = {
-            'description': 'Updated description',
+            'description': self.example_description,
             'study_areas': [self.study_area1.id]
         }
 
@@ -37,9 +39,9 @@ class TestAuthView(APITestCase):
         file_mock.name = 'profile_picture.jpg'
 
         # request data
-        headers = {'User-id': self.user1.id, 'Authorization': 'Bearer 0123456789'}
+        headers = {'User-id': self.user1.id, 'Authorization': self.user_bearer_token}
         data = {
-            'description': 'Updated description',
+            'description': self.example_description,
             'study_areas': [self.study_area1.id],
             'profile_picture': file_mock
         }
@@ -49,7 +51,7 @@ class TestAuthView(APITestCase):
 
 
     def test_update_profile_missing_data(self):
-        headers = {'User-id': self.user1.id, 'Authorization': 'Bearer 0123456789'}
+        headers = {'User-id': self.user1.id, 'Authorization': self.user_bearer_token}
         data = {
             'description': 'Updated description'
         }
@@ -63,10 +65,10 @@ class TestAuthView(APITestCase):
         max_id = Material.objects.aggregate(max_id=Max('id'))['max_id']
         non_existent_id = max_id + 2 if max_id is not None else 1
     
-        headers = {'User-id': non_existent_id, 'Authorization': 'Bearer 0123456789'}
+        headers = {'User-id': non_existent_id, 'Authorization': self.user_bearer_token}
         data = {
             'id_token': '0123456789',
-            'description': 'Updated description',
+            'description': self.example_description,
             'study_areas': [self.study_area1.id]
         }
 

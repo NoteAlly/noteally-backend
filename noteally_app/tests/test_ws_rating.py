@@ -53,6 +53,7 @@ class TestMaterialsView(APITestCase):
     def setUp(self):
         self = fill_db(self)
         self.header = {'User-id': self.user1.id}
+        self.error_response = {'error': 'Material does not exist'}
 
 
     def test_like(self):
@@ -110,11 +111,10 @@ class TestMaterialsView(APITestCase):
         # api request
         url = reverse('like', kwargs={'material_id': non_existent_id})
         response = self.client.post(url, headers=self.header)
-        expected_response = {"error": "Material does not exist"}
         
         # assertions
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.data, expected_response)
+        self.assertEqual(response.data, self.error_response)
 
 
 
@@ -154,11 +154,10 @@ class TestMaterialsView(APITestCase):
         # api request
         url = reverse('like', kwargs={'material_id': non_existent_id})
         response = self.client.delete(url, headers=self.header)
-        expected_response = {"error": "Material does not exist"}
         
         # assertions
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.data, expected_response)
+        self.assertEqual(response.data, self.error_response)
 
 
 
@@ -226,11 +225,10 @@ class TestMaterialsView(APITestCase):
         # api request
         url = reverse('dislike', kwargs={'material_id': non_existent_id})
         response = self.client.post(url, headers=self.header)
-        expected_response = {"error": "Material does not exist"}
         
         # assertions
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.data, expected_response)
+        self.assertEqual(response.data, self.error_response)
 
 
 
@@ -270,8 +268,7 @@ class TestMaterialsView(APITestCase):
         # api request
         url = reverse('dislike', kwargs={'material_id': non_existent_id})
         response = self.client.delete(url, headers=self.header)
-        expected_response = {"error": "Material does not exist"}
         
         # assertions
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.data, expected_response)
+        self.assertEqual(response.data, self.error_response)
