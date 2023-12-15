@@ -29,14 +29,10 @@ def unlock_premium(request):
 
 # Subscribe the user to the SNS topic to allow notifications of new uploads
 def subscribe_to_sns_topic(user, user_to_follow):
-    # TODO: add sns_topic_arn to the database
-    #if not user_to_follow.sns_topic_arn:
+    # Obtain the topic ARN
     topic_name = f'uploads-user-{user_to_follow.id}'
-    #else:
-    #    topic_name = user_to_follow.sns_topic_arn.split(':')[-1]
-    
-    # Create a new SNS topic for the user if it doesn't exist
     topic_arn = f'arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:{topic_name}'
+    print(f"Topic ARN: {topic_arn}")
 
     # Presigned URL - SNS
     sns_client = boto3.client(
@@ -49,7 +45,11 @@ def subscribe_to_sns_topic(user, user_to_follow):
 
     # Create a new topic for the user to follow if it doesn't exist
     try:
-        sns_client.create_topic(Name=topic_name)
+        response = sns_client.list_topics()
+        existing_topics = [topic['TopicArn'] for topic in response.get('Topics', [])]
+        if topic_arn not in existing_topics:
+            # Create a new topic for the user to follow if it doesn't exist
+            sns_client.create_topic(Name=topic_name)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

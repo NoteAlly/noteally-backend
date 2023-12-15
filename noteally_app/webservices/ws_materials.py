@@ -10,16 +10,10 @@ import boto3
 from botocore.client import Config
 from django.conf import settings
 
-# Notify all subscribers
+# Publish message to SNS topic for each subscriber
 def notify_subscribers(serializer, user):
-    # Create topic for user if it doesn't exist
-    # TODO: add sns_topic_arn to the database
-    #if not user.sns_topic_arn:
+    # Obtain the topic ARN
     topic_name = f'uploads-user-{user.id}'
-    #else: 
-    #    topic_name = user.sns_topic_arn.split(':')[-1]
-
-    # Publish message to SNS topic for each subscriber
     topic_arn = f'arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:{topic_name}'
     print(f"Topic ARN: {topic_arn}")
 
@@ -32,8 +26,18 @@ def notify_subscribers(serializer, user):
         config=Config(signature_version='s3v4')
     )
 
+    # Create a new topic for the user to follow if it doesn't exist
+    try:
+        response = sns_client.list_topics()
+        existing_topics = [topic['TopicArn'] for topic in response.get('Topics', [])]
+        if topic_arn not in existing_topics:
+            # Create a new topic for the user to follow if it doesn't exist
+            sns_client.create_topic(Name=topic_name)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     # Create a message to publish
-    message = f"New material posted by {user.first_name} {user.last_name} with title {serializer.name}"  # Adjust the message as needed
+    message = f"New material posted by {user.first_name} {user.last_name} with title {serializer.validated_data['name']}"  # Adjust the message as needed
     print(f"Message: {message}")
 
     # Create a subject for the message
@@ -75,6 +79,8 @@ def post_materials(request):
 
         # Publish message to SNS topic for each subscriber
         notify_subscribers(serializer, user)
+
+        return Response({"Success": "Successfully Created", "created_id": object_.id}, status=status.HTTP_201_CREATED)
 
     return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST) 
 
