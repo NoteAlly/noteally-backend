@@ -106,16 +106,16 @@ class TestUserView(APITestCase):
         # Assert the response data
         self.assertEqual(response.data, expected_response)
         
-    @patch('noteally_app.webservices.ws_downloads.boto3')
+    @patch('noteally_app.webservices.ws_user.boto3')
     def test_subscribe(self, mock_boto3):
         # mock response from boto3
-        mock_boto3.client = MagicMock("sns", region_name="eu-north-1")
+        mock_boto3.client.return_value = MagicMock()
         
         # Set up the desired behavior for list_topics
-        mock_boto3.list_topics.return_value = {'Topics': []}
+        mock_boto3.list_topics = {'Topics': []}
 
         # Set up the desired behavior for create_topic
-        mock_boto3.create_topic.return_value = {'TopicArn': 'test_topic_arn'}
+        mock_boto3.create_topic = {'TopicArn': 'test_topic_arn'}
 
         # Set up the desired behavior for subscribe
         mock_boto3.subscribe.return_value = {'SubscriptionArn': 'test_subscription_arn'}
