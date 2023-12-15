@@ -105,7 +105,12 @@ class TestUserView(APITestCase):
         # Assert the response data
         self.assertEqual(response.data, expected_response)
         
-    def test_subscribe(self):
+    @patch('noteally_app.webservices.ws_downloads.boto3')
+    def test_subscribe(self, mock_boto3):
+        # mock response from boto3
+        mock_boto3.client.return_value = MagicMock()
+        mock_boto3.client.return_value.generate_presigned_url.return_value = '/test_media/' + self.material1.file_name
+
         url = reverse('subscribe', args=[self.user1.id])
         headers = {'User-id': self.user2.id}
 
