@@ -10,6 +10,8 @@ import boto3
 from botocore.client import Config
 from django.conf import settings
 
+USER_NOT_FOUND_RESPONSE = {'error': 'User not found'}
+
 def unlock_premium(request):
     try:
         user = User.objects.get(id=request.headers['User-id'])
