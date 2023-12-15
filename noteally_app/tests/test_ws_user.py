@@ -110,10 +110,15 @@ class TestUserView(APITestCase):
     def test_subscribe(self, mock_boto3):
         # mock response from boto3
         mock_boto3.client.return_value = MagicMock()
-        # Set up the region in the mock to avoid NoRegionError
-        mock_boto3.client.return_value._client_config.region_name = settings.AWS_REGION_NAME
-        # Set up the account ID in the mock to avoid NoCredentialsError
-        mock_boto3.client.return_value._client_config.account_id = settings.AWS_ACCOUNT_ID
+        
+        # Set up the desired behavior for list_topics
+        mock_boto3.list_topics.return_value = {'Topics': []}
+
+        # Set up the desired behavior for create_topic
+        mock_boto3.create_topic.return_value = {'TopicArn': 'test_topic_arn'}
+
+        # Set up the desired behavior for subscribe
+        mock_boto3.subscribe.return_value = {'SubscriptionArn': 'test_subscription_arn'}
 
         url = reverse('subscribe', args=[self.user1.id])
         headers = {'User-id': self.user2.id}
