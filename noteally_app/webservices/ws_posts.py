@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from noteally_app.serializers import MaterialSerializer
 from noteally_app.models import Material, User
 
+ERROR_RESPONSE = {'error': 'Error while getting posts'}
 
 def get_posts(request):
     try:
@@ -15,11 +16,11 @@ def get_posts(request):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    except:
-        return Response({'error': 'Error while getting posts'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as _:
+        return Response(ERROR_RESPONSE, status=status.HTTP_400_BAD_REQUEST)
     
 
-def get_posts_by_user(request, user_id):
+def get_posts_by_user(user_id):
     try:
         user = User.objects.get(id=user_id)
         materials = Material.objects.filter(user=user).order_by('-upload_date')
@@ -27,8 +28,8 @@ def get_posts_by_user(request, user_id):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    except:
-        return Response({'error': 'Error while getting posts'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as _:
+        return Response(ERROR_RESPONSE, status=status.HTTP_400_BAD_REQUEST)
 
 
 def delete_post(request, material_id):
@@ -43,8 +44,8 @@ def delete_post(request, material_id):
         
         return Response({'error': 'Post does not exist'}, status=status.HTTP_400_BAD_REQUEST)
 
-    except:
-        return Response({'error': 'Error while getting posts'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as _:
+        return Response(ERROR_RESPONSE, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -64,6 +65,6 @@ def handle_id(request, material_id):
 @cognito_login_required
 def handle_user_id(request, user_id):
     if request.method == 'GET':
-        return get_posts_by_user(request, user_id)
+        return get_posts_by_user(user_id)
 
 

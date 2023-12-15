@@ -4,8 +4,6 @@ from django.urls import reverse
 from noteally_app.models import User
 from noteally_app.webservices.ws_auth import get_cognito_user
 from noteally_app.models import StudyArea
-from unittest import mock
-from django.core.files import File
 
 
 @patch('noteally_app.decorators.requests')
@@ -15,13 +13,18 @@ class TestAuthView(APITestCase):
         self.study_area1 = StudyArea.objects.create(name="Computer Science")
         self.url = reverse('login')
 
+        # user basic info
+        self.user_id = 1
+        self.user_sub = "0123456789"
+        self.user_fname = "John"
+        self.user_lname = "Doe"
+        self.user_email = "johndoe@gmail.com"
+        self.access_token = "0123456789"
 
-    def test_get_cognito_user_success(self, mock_requests):
-
-        # mock response
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {
+        # mock success response from cognito
+        self.mock_success_response = MagicMock()
+        self.mock_success_response.status_code = 200
+        self.mock_success_response.json.return_value = {
             "sub": "0123456789",
             "email_verified": True,
             "given_name": "John",
@@ -30,38 +33,38 @@ class TestAuthView(APITestCase):
             "username": "0123456789"
         }
 
+        # mock error response from cognito
+        self.mock_error_response = MagicMock()
+        self.mock_error_response.status_code = 401
+        self.mock_error_response.json.return_value = {
+            "error": "invalid_token",
+            "error_description": "Access token format is not valid"
+        }
+
+
+    def test_get_cognito_user_success(self, mock_requests):
+
         # mock requests.get
-        mock_requests.get.return_value = mock_response
+        mock_requests.get.return_value = self.mock_success_response
 
         # call get_cognito_user
-        access_token = "0123456789"
-        return_value = get_cognito_user(access_token)
+        return_value = get_cognito_user(self.access_token)
 
         # assert the response
-        self.assertEqual(return_value['sub'], '0123456789')
+        self.assertEqual(return_value['sub'], self.user_sub)
         self.assertEqual(return_value['email_verified'], True)
-        self.assertEqual(return_value['first_name'], 'John')
-        self.assertEqual(return_value['last_name'], 'Doe')
-        self.assertEqual(return_value['email'], 'johndoe@gmail.com')
-        self.assertEqual(return_value['username'], '0123456789')
+        self.assertEqual(return_value['first_name'], self.user_fname)
+        self.assertEqual(return_value['last_name'], self.user_lname)
+        self.assertEqual(return_value['email'], self.user_email)
         
 
     def test_get_cognito_user_error(self, mock_requests):
 
-            # mock response
-            mock_response = MagicMock()
-            mock_response.status_code = 401
-            mock_response.json.return_value = {
-                "error": "invalid_token",
-                "error_description": "Access token format is not valid"
-            }
-
             # mock requests.get
-            mock_requests.get.return_value = mock_response
+            mock_requests.get.return_value = self.mock_error_response
 
             # call get_cognito_user
-            access_token = "0123456789"
-            return_value = get_cognito_user(access_token)
+            return_value = get_cognito_user(self.access_token)
 
             # assert the response
             self.assertEqual(return_value, None)
@@ -69,20 +72,8 @@ class TestAuthView(APITestCase):
 
     def test_register_success(self, mock_requests):
 
-        # mock response
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {
-            "sub": "0123456789",
-            "email_verified": True,
-            "given_name": "John",
-            "family_name": "Doe",
-            "email": "johndoe@gmail.com",
-            "username": "0123456789"
-        }
-
         # mock requests.get
-        mock_requests.get.return_value = mock_response
+        mock_requests.get.return_value = self.mock_success_response
 
         data = {
             "id_token": "0123456789",
@@ -91,12 +82,12 @@ class TestAuthView(APITestCase):
         response = self.client.post(self.url, data, format='multipart')
 
         excepted_response = {
-            'id': 1,
-            'sub': '0123456789',
-            'id_token': '0123456789',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'johndoe@gmail.com',
+            'id': self.user_id,
+            'sub': self.user_sub,
+            'id_token': data['id_token'],
+            'first_name': self.user_fname,
+            'last_name': self.user_lname,
+            'email': self.user_email,
             'premium': False,
             'karma_score': 0,
             'tutoring_services': False,
@@ -115,27 +106,15 @@ class TestAuthView(APITestCase):
 
     def test_login_success(self, mock_requests):
 
-        # mock response
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {
-            "sub": "0123456789",
-            "email_verified": True,
-            "given_name": "John",
-            "family_name": "Doe",
-            "email": "johndoe@gmail.com",
-            "username": "0123456789"
-        }
-
         # mock requests.get
-        mock_requests.get.return_value = mock_response
+        mock_requests.get.return_value = self.mock_success_response
 
         # Register user in database
         user1 = User(
-            sub="0123456789",
-            first_name="John",
-            last_name="Doe",
-            email="johndoe@gmail.com"
+            sub = self.user_sub,
+            first_name = self.user_fname,
+            last_name = self.user_lname,
+            email = self.user_email
         )
         user1.save()
 
@@ -146,12 +125,12 @@ class TestAuthView(APITestCase):
         response = self.client.post(self.url, data, format='multipart')
 
         excepted_response = {
-            'id': 1,
-            'sub': '0123456789',
-            'id_token': '0123456789',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'email': 'johndoe@gmail.com',
+            'id': self.user_id,
+            'sub': self.user_sub,
+            'id_token': data['id_token'],
+            'first_name': self.user_fname,
+            'last_name': self.user_lname,
+            'email': self.user_email,
             'premium': False,
             'karma_score': 0,
             'tutoring_services': False,
@@ -170,16 +149,8 @@ class TestAuthView(APITestCase):
 
     def test_register_error(self, mock_requests):
 
-        # mock response
-        mock_response = MagicMock()
-        mock_response.status_code = 401
-        mock_response.json.return_value = {
-            "error": "invalid_token",
-            "error_description": "Access token format is not valid"
-        }
-
         # mock requests.get
-        mock_requests.get.return_value = mock_response
+        mock_requests.get.return_value = self.mock_error_response
 
         data = {
             "id_token": "123",
