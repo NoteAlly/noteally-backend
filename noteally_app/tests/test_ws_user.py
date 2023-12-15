@@ -109,7 +109,7 @@ class TestUserView(APITestCase):
     @patch('noteally_app.webservices.ws_downloads.boto3')
     def test_subscribe(self, mock_boto3):
         # mock response from boto3
-        mock_boto3.client.return_value = MagicMock()
+        mock_boto3.client = MagicMock("sns", region_name="eu-north-1")
         
         # Set up the desired behavior for list_topics
         mock_boto3.list_topics.return_value = {'Topics': []}
