@@ -4,6 +4,7 @@ from noteally_app.tests.fill_db import fill_db
 from django.db.models import Max
 from noteally_app.models import User, Follower
 from unittest.mock import patch, MagicMock
+from django.conf import settings
 
 # import ErrorDetail in the line below
 from rest_framework.exceptions import ErrorDetail
@@ -109,7 +110,10 @@ class TestUserView(APITestCase):
     def test_subscribe(self, mock_boto3):
         # mock response from boto3
         mock_boto3.client.return_value = MagicMock()
-        mock_boto3.client.return_value.generate_presigned_url.return_value = '/test_media/' + self.material1.file_name
+        # Set up the region in the mock to avoid NoRegionError
+        mock_boto3.client.return_value._client_config.region_name = settings.AWS_REGION_NAME
+        # Set up the account ID in the mock to avoid NoCredentialsError
+        mock_boto3.client.return_value._client_config.account_id = settings.AWS_ACCOUNT_ID
 
         url = reverse('subscribe', args=[self.user1.id])
         headers = {'User-id': self.user2.id}
