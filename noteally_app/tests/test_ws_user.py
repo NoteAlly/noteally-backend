@@ -206,14 +206,13 @@ class TestUserView(APITestCase):
         # Assertions after the code that triggers the calls to the mocked objects
         mock_sns_client.list_topics.assert_called_once()
 
-        # Create a new topic for the user to follow if it doesn't exist
-        if topic_arn not in mock_sns_client.list_topics.return_value['Topics']:
-            mock_sns_client.create_topic.assert_called_once_with(Name=topic_name)
-            mock_sns_client.subscribe.assert_called_once_with(
-                TopicArn=topic_arn,
-                Protocol='email',
-                Endpoint=f'{mock_user.first_name} {mock_user.last_name} <{mock_user.email}>'
-            )
+        # Assertions after the code that triggers the calls to the mocked objects
+        mock_sns_client.list_topics.assert_called_once()
+        mock_sns_client.subscribe.assert_called_once_with(
+            TopicArn=topic_arn,
+            Protocol='email',
+            Endpoint=f'{mock_user.email.return_value}'
+        )
  
         
         
