@@ -6,6 +6,9 @@ from noteally_app.tests.fill_db import fill_db
 from rest_framework.exceptions import ErrorDetail
 import shutil
 
+# For Mocking Notifications
+from unittest.mock import patch, MagicMock
+from noteally_app.webservices.ws_materials import notify_subscribers
 
 class TestMaterialsView(APITestCase):
     
@@ -19,35 +22,49 @@ class TestMaterialsView(APITestCase):
         shutil.rmtree('test_media', ignore_errors=True)
 
 
-    def test_post_material_success(self):
+    @patch('noteally_app.webservices.ws_user.boto3')
+    def test_post_material_success(self, mock_boto3):
+        # mock response from boto3
+        mock_boto3.client.return_value = MagicMock()
+        
+        # Set up the desired behavior for list_topics
+        mock_boto3.list_topics = {'Topics': []}
+
+        # Set up the desired behavior for create_topic
+        mock_boto3.create_topic = {'TopicArn': 'test_topic_arn'}
+
         file_mock = mock.MagicMock(spec=File, name="FileMock")
         file_mock.name = 'test.pdf'
-        
-        # form data
-        data = {
-            "user": self.user1.id,
-            "name": "Introduction to Programming1",
-            "description": "Introduction to Programming1",
-            "price": 0,
-            "university": self.university1.id,
-            "file": file_mock,
-            "study_areas": [self.study_area1.id, self.study_area2.id],
-        }
 
-        response = self.client.post(self.url, data, headers=self.header, format='multipart')
-        
-        expected_response = {
-            "Success": "Successfully Created",
-            "created_id": response.data['created_id'],
-        }
-        
-        # Assert the response status code
-        self.assertEqual(response.status_code, 201)
-        
-        # Assert the response data
-        self.assertEqual(response.data['Success'], expected_response['Success'])
-        
-    
+        # Mock the part of the code that generates topic_name and topic_arn
+        with patch('noteally_app.webservices.ws_materials.notify_subscribers') as mock_notify_subscribers:
+            # form data
+            data = {
+                "user": self.user1.id,
+                "name": "Introduction to Programming1",
+                "description": "Introduction to Programming1",
+                "price": 0,
+                "university": self.university1.id,
+                "file": file_mock,
+                "study_areas": [self.study_area1.id, self.study_area2.id],
+            }
+
+            response = self.client.post(self.url, data, headers=self.header, format='multipart')
+            
+            expected_response = {
+                "Success": "Successfully Created",
+                "created_id": response.data['created_id'],
+            }
+            
+            # Assert the response status code
+            self.assertEqual(response.status_code, 201)
+            
+            # Assert the response data
+            self.assertEqual(response.data['Success'], expected_response['Success'])
+            
+            # Assert that subscribe_to_sns_topic was called with the correct arguments
+            mock_notify_subscribers.assert_called_once_with(data, self.user1)
+
     def test_post_material_invalid_file(self):
         data = {
             "user": self.user1.id,

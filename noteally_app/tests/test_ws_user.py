@@ -3,8 +3,10 @@ from django.urls import reverse
 from noteally_app.tests.fill_db import fill_db
 from django.db.models import Max
 from noteally_app.models import User, Follower
-from unittest.mock import patch, MagicMock
 from django.conf import settings
+
+# To mock the SNS topic creation
+from unittest.mock import patch, MagicMock
 from noteally_app.webservices.ws_user import subscribe_to_sns_topic
 
 # import ErrorDetail in the line below
