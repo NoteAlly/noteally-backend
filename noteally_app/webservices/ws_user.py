@@ -46,21 +46,18 @@ def subscribe_to_sns_topic(user, user_to_follow):
     )
 
     # Create a new topic for the user to follow if it doesn't exist
-    try:
-        response = sns_client.list_topics()
-        existing_topics = [topic['TopicArn'] for topic in response.get('Topics', [])]
-        if topic_arn not in existing_topics:
-            # Create a new topic for the user to follow if it doesn't exist
-            sns_client.create_topic(Name=topic_name)
-    
-        # Subscribe the user to the topic
-        sns_client.subscribe(
-            TopicArn=topic_arn,
-            Protocol='email',  
-            Endpoint=user.email  
-        )
-    except Exception as e:
-        return Response(f"Failed to publish message to subscribers: {str(e)}")
+    response = sns_client.list_topics()
+    existing_topics = [topic['TopicArn'] for topic in response.get('Topics', [])]
+    if topic_arn not in existing_topics:
+        # Create a new topic for the user to follow if it doesn't exist
+        sns_client.create_topic(Name=topic_name)
+
+    # Subscribe the user to the topic
+    sns_client.subscribe(
+        TopicArn=topic_arn,
+        Protocol='email',  
+        Endpoint=user.email  
+    )
 
 @api_view(['POST']) 
 def subscribe(request, user_id): 
