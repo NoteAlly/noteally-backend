@@ -1,8 +1,6 @@
 from .settings import * #NOSONAR
 
 
-DEBUG = True
-
 CORS_ORIGIN_ALLOW_ALL = True
 
 DATABASES = {
