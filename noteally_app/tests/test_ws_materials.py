@@ -5,7 +5,6 @@ from django.urls import reverse
 from noteally_app.tests.fill_db import fill_db
 from rest_framework.exceptions import ErrorDetail
 import shutil
-from django.conf import settings
 
 # For Mocking Notifications
 from unittest.mock import patch, MagicMock
@@ -178,6 +177,10 @@ class TestMaterialsView(APITestCase):
     @patch('noteally_app.webservices.ws_materials.boto3.client')
     @patch('noteally_app.webservices.ws_materials.Response')  # Assuming Response is imported from DRF
     def test_notify_subscribers(self, mock_response, mock_boto3_client):
+        # Mock AWS settings
+        mock_aws_region = 'mocked-region'
+        mock_aws_account_id = 'mocked-account-id'
+
         # Mock the SNS client
         mock_sns_client = mock_boto3_client.return_value
         mock_sns_client.list_topics.return_value = {'Topics': []}
@@ -194,22 +197,25 @@ class TestMaterialsView(APITestCase):
         mock_user.last_name = 'Doe'
 
         with patch('builtins.print') as mock_print:
-            # Call the function
-            notify_subscribers(mock_serializer, mock_user)
+            # Patch the AWS settings
+            with patch('noteally_app.webservices.ws_materials.settings.AWS_REGION_NAME', mock_aws_region):
+                with patch('noteally_app.webservices.ws_materials.settings.AWS_ACCOUNT_ID', mock_aws_account_id):
+                    # Call the function
+                    notify_subscribers(mock_serializer, mock_user)
 
-            # Assert SNS client calls
-            mock_sns_client.list_topics.assert_called_once()
-            mock_sns_client.create_topic.assert_called_once_with(Name=f'uploads-user-{mock_user.id}')
-            mock_sns_client.publish.assert_called_once_with(
-                TopicArn=f'arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:uploads-user-{mock_user.id}',
-                Message=f"New material posted by {mock_user.first_name} {mock_user.last_name} with title {mock_serializer.validated_data['name']}",
-                Subject=f"New material posted by {mock_user.first_name} {mock_user.last_name}",
-                MessageStructure='string'
-            )
+                    # Assert SNS client calls
+                    mock_sns_client.list_topics.assert_called_once()
+                    mock_sns_client.create_topic.assert_called_once_with(Name=f'uploads-user-{mock_user.id}')
+                    mock_sns_client.publish.assert_called_once_with(
+                        TopicArn=f'arn:aws:sns:{mock_aws_region}:{mock_aws_account_id}:uploads-user-{mock_user.id}',
+                        Message=f"New material posted by {mock_user.first_name} {mock_user.last_name} with title {mock_serializer.validated_data['name']}",
+                        Subject=f"New material posted by {mock_user.first_name} {mock_user.last_name}",
+                        MessageStructure='string'
+                    )
 
-            # Assert print calls
-            mock_print.assert_any_call(f"Topic ARN: arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:uploads-user-{mock_user.id}")
-            mock_print.assert_any_call(f"Message: New material posted by {mock_user.first_name} {mock_user.last_name} with title {mock_serializer.validated_data['name']}")
-            
-            # Assert Response not called (since it's not an actual HTTP request)
-            mock_response.assert_not_called()
+                    # Assert print calls
+                    mock_print.assert_any_call(f"Topic ARN: arn:aws:sns:{mock_aws_region}:{mock_aws_account_id}:uploads-user-{mock_user.id}")
+                    mock_print.assert_any_call(f"Message: New material posted by {mock_user.first_name} {mock_user.last_name} with title {mock_serializer.validated_data['name']}")
+                    
+                    # Assert Response not called (since it's not an actual HTTP request)
+                    mock_response.assert_not_called()

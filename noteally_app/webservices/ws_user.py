@@ -52,18 +52,15 @@ def subscribe_to_sns_topic(user, user_to_follow):
         if topic_arn not in existing_topics:
             # Create a new topic for the user to follow if it doesn't exist
             sns_client.create_topic(Name=topic_name)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    # Subscribe the user to the topic
-    try:
+    
+        # Subscribe the user to the topic
         sns_client.subscribe(
             TopicArn=topic_arn,
             Protocol='email',  
             Endpoint=user.email  
         )
     except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(f"Failed to publish message to subscribers: {str(e)}")
 
 @api_view(['POST']) 
 def subscribe(request, user_id): 
