@@ -26,12 +26,6 @@ class TestMaterialsView(APITestCase):
     def test_post_material_success(self, mock_boto3):
         # mock response from boto3
         mock_boto3.client.return_value = MagicMock()
-        
-        # Set up the desired behavior for list_topics
-        mock_boto3.list_topics = {'Topics': []}
-
-        # Set up the desired behavior for create_topic
-        mock_boto3.create_topic = {'TopicArn': 'test_topic_arn'}
 
         file_mock = mock.MagicMock(spec=File, name="FileMock")
         file_mock.name = 'test.pdf'
@@ -94,14 +88,7 @@ class TestMaterialsView(APITestCase):
     def test_post_material_no_file(self, mock_boto3):
         # mock response from boto3
         mock_boto3.client.return_value = MagicMock()
-        
-        # Set up the desired behavior for list_topics
-        mock_boto3.list_topics = {'Topics': []}
 
-        # Set up the desired behavior for create_topic
-        mock_boto3.create_topic = {'TopicArn': 'test_topic_arn'}
-
-        
         # Mock the part of the code that generates topic_name and topic_arn
         with patch('noteally_app.webservices.ws_materials.notify_subscribers') as mock_notify_subscribers:
             data = {
@@ -185,3 +172,43 @@ class TestMaterialsView(APITestCase):
 
         # Assert the response data
         self.assertEquals(response.data['results'][0]['id'], self.material2.id)
+
+
+    @patch('noteally_app.webservices.ws_materials.boto3.client')
+    @patch('noteally_app.webservices.ws_materials.Response')  # Assuming Response is imported from DRF
+    def test_notify_subscribers(self, mock_response, mock_boto3_client):
+        # Mock the SNS client
+        mock_sns_client = mock_boto3_client.return_value
+        mock_sns_client.list_topics.return_value = {'Topics': []}
+        mock_sns_client.publish.return_value = {'MessageId': 'test_message_id'}
+
+        # Mock the serializer
+        mock_serializer = MagicMock()
+        mock_serializer.validated_data = {'name': 'Test Material'}
+
+        # Mock the user
+        mock_user = MagicMock()
+        mock_user.id = 123
+        mock_user.first_name = 'John'
+        mock_user.last_name = 'Doe'
+
+        with patch('builtins.print') as mock_print:
+            # Call the function
+            notify_subscribers(mock_serializer, mock_user)
+
+            # Assert SNS client calls
+            mock_sns_client.list_topics.assert_called_once()
+            mock_sns_client.create_topic.assert_called_once_with(Name=f'uploads-user-{mock_user.id}')
+            mock_sns_client.publish.assert_called_once_with(
+                TopicArn=f'arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:uploads-user-{mock_user.id}',
+                Message=f"New material posted by {mock_user.first_name} {mock_user.last_name} with title {mock_serializer.validated_data['name']}",
+                Subject=f"New material posted by {mock_user.first_name} {mock_user.last_name}",
+                MessageStructure='string'
+            )
+
+            # Assert print calls
+            mock_print.assert_any_call(f"Topic ARN: arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:uploads-user-{mock_user.id}")
+            mock_print.assert_any_call(f"Message: New material posted by {mock_user.first_name} {mock_user.last_name} with title {mock_serializer.validated_data['name']}")
+            
+            # Assert Response not called (since it's not an actual HTTP request)
+            mock_response.assert_not_called()

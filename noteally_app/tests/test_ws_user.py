@@ -114,15 +114,6 @@ class TestUserView(APITestCase):
         # mock response from boto3
         mock_boto3.client.return_value = MagicMock()
         
-        # Set up the desired behavior for list_topics
-        mock_boto3.list_topics = {'Topics': []}
-
-        # Set up the desired behavior for create_topic
-        mock_boto3.create_topic = {'TopicArn': 'test_topic_arn'}
-
-        # Set up the desired behavior for subscribe
-        mock_boto3.subscribe.return_value = {'SubscriptionArn': 'test_subscription_arn'}
-
         # Mock the part of the code that generates topic_name and topic_arn
         with patch('noteally_app.webservices.ws_user.subscribe_to_sns_topic') as mock_subscribe_to_sns_topic:
             # Assuming self.user1 and self.user2 are defined earlier in your test setup
