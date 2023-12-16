@@ -178,7 +178,6 @@ class TestUserView(APITestCase):
         # Assert the response status code
         self.assertEqual(response.status_code, 200)
     
-    
     @patch('noteally_app.webservices.ws_user.boto3')
     def test_user_sns_topic_creation(self, mock_boto3):
         # mock response from boto3
@@ -196,23 +195,26 @@ class TestUserView(APITestCase):
         mock_user.first_name = 'John'
         mock_user.last_name = 'Doe'
 
-        # Subscribe the user to the SNS topic to allow notifications of new uploads
-        topic_name = f'uploads-user-{mock_user.id}'
-        topic_arn = f'arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:{topic_name}'
+        # Mock AWS region and account ID
+        mock_region = 'mocked-region'
+        mock_account_id = 'mocked-account-id'
 
-        # Subscribe the user to the SNS topic to allow notifications of new uploads
-        subscribe_to_sns_topic(mock_user, mock_user)
+        with patch('noteally_app.webservices.ws_user.settings.AWS_REGION_NAME', mock_region):
+            with patch('noteally_app.webservices.ws_user.settings.AWS_ACCOUNT_ID', mock_account_id):
+                # Subscribe the user to the SNS topic to allow notifications of new uploads
+                topic_name = f'uploads-user-{mock_user.id}'
+                topic_arn = f'arn:aws:sns:{mock_region}:{mock_account_id}:{topic_name}'
 
-        # Assertions after the code that triggers the calls to the mocked objects
-        mock_sns_client.list_topics.assert_called_once()
+                # Subscribe the user to the SNS topic to allow notifications of new uploads
+                subscribe_to_sns_topic(mock_user, mock_user)
 
-        # Assertions after the code that triggers the calls to the mocked objects
-        mock_sns_client.list_topics.assert_called_once()
-        mock_sns_client.subscribe.assert_called_once_with(
-            TopicArn=topic_arn,
-            Protocol='email',
-            Endpoint=ANY
-        )
- 
-        
-        
+                # Assertions after the code that triggers the calls to the mocked objects
+                mock_sns_client.list_topics.assert_called_once()
+                mock_sns_client.subscribe.assert_called_once_with(
+                    TopicArn=topic_arn,
+                    Protocol='email',
+                    Endpoint=ANY
+                )
+
+            
+            

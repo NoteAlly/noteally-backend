@@ -33,18 +33,14 @@ def notify_subscribers(serializer, user):
         if topic_arn not in existing_topics:
             # Create a new topic for the user to follow if it doesn't exist
             sns_client.create_topic(Name=topic_name)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # Create a message to publish
-    message = f"New material posted by {user.first_name} {user.last_name} with title {serializer.validated_data['name']}"  # Adjust the message as needed
-    print(f"Message: {message}")
+        # Create a message to publish
+        message = f"New material posted by {user.first_name} {user.last_name} with title {serializer.validated_data['name']}"  # Adjust the message as needed
+        print(f"Message: {message}")
 
-    # Create a subject for the message
-    subject = f"New material posted by {user.first_name} {user.last_name}"  # Adjust the subject as needed
-    
-    # Publish message to SNS in the topic 
-    try:
+        # Create a subject for the message
+        subject = f"New material posted by {user.first_name} {user.last_name}"  # Adjust the subject as needed
+        
         sns_client.publish(
             TopicArn=topic_arn,
             Message=message,
