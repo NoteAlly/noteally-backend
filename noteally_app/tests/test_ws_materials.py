@@ -22,7 +22,7 @@ class TestMaterialsView(APITestCase):
         shutil.rmtree('test_media', ignore_errors=True)
 
 
-    @patch('noteally_app.webservices.ws_user.boto3')
+    @patch('noteally_app.webservices.ws_materials.boto3')
     def test_post_material_success(self, mock_boto3):
         # mock response from boto3
         mock_boto3.client.return_value = MagicMock()
