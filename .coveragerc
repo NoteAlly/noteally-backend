@@ -1,6 +1,0 @@
-[run]
-omit = noteally_app/tests/*, manage.py, noteally_app/admin.py, noteally_app/apps.py, noteally_app/models.py, noteally_app/serializers.py, noteally_app/views.py, noteally_app/webservices/ws_test.py, noteally_app/CustomPagination.py
-include = noteally_app/*
-
-[report]
-fail_under = 80

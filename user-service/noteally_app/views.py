@@ -1,0 +1,1 @@
+# Project views are located in the 'webservices' folder
