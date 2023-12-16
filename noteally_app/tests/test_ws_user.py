@@ -121,7 +121,7 @@ class TestUserView(APITestCase):
         mock_boto3.subscribe.return_value = {'SubscriptionArn': 'test_subscription_arn'}
 
         # Mock the part of the code that generates topic_name and topic_arn
-        with patch('__main__.subscribe_to_sns_topic') as mock_subscribe_to_sns_topic:
+        with patch('ws_user.subscribe_to_sns_topic') as mock_subscribe_to_sns_topic:
             # Assuming self.user1 and self.user2 are defined earlier in your test setup
             url = reverse('subscribe', args=[self.user1.id])
             headers = {'User-id': self.user2.id}
