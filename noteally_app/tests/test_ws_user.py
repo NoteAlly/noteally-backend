@@ -12,7 +12,6 @@ from noteally_app.webservices.ws_user import subscribe_to_sns_topic
 # import ErrorDetail in the line below
 from rest_framework.exceptions import ErrorDetail
 
-
 class TestUserView(APITestCase):
     
     def setUp(self):
@@ -179,7 +178,7 @@ class TestUserView(APITestCase):
         # Assert the response status code
         self.assertEqual(response.status_code, 200)
     
-    '''
+    
     @patch('noteally_app.webservices.ws_user.boto3')
     def test_user_sns_topic_creation(self, mock_boto3):
         # mock response from boto3
@@ -197,7 +196,7 @@ class TestUserView(APITestCase):
 
         # Assert the topic creation
         mock_boto3.client.create_topic.assert_called_once_with(Name=topic_name)
-    '''
+    
         
  
         
