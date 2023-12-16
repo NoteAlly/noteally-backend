@@ -6,7 +6,50 @@ from noteally_app.CustomPagination import CustomPagination
 from noteally_app.serializers import MaterialIDSerializer, PostMaterialSerializer, MaterialSerializer
 from noteally_app.models import Material, Download, User, Like 
 import uuid
+import boto3
+from botocore.client import Config
+from django.conf import settings
 
+# Publish message to SNS topic for each subscriber
+def notify_subscribers(serializer, user):
+    # Obtain the topic ARN
+    topic_name = f'uploads-user-{user.id}'
+    topic_arn = f'arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:{topic_name}'
+    print(f"Topic ARN: {topic_arn}")
+
+    # Presigned URL - SNS
+    sns_client = boto3.client(
+        service_name='sns',
+        region_name=settings.AWS_REGION_NAME,
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        config=Config(signature_version='s3v4')
+    )
+
+    # Create a new topic for the user to follow if it doesn't exist
+    try:
+        response = sns_client.list_topics()
+        existing_topics = [topic['TopicArn'] for topic in response.get('Topics', [])]
+        if topic_arn not in existing_topics:
+            # Create a new topic for the user to follow if it doesn't exist
+            sns_client.create_topic(Name=topic_name)
+
+        # Create a message to publish
+        message = f"New material posted by {user.first_name} {user.last_name} with title {serializer.validated_data['name']}"  # Adjust the message as needed
+        print(f"Message: {message}")
+
+        # Create a subject for the message
+        subject = f"New material posted by {user.first_name} {user.last_name}"  # Adjust the subject as needed
+        
+        sns_client.publish(
+            TopicArn=topic_arn,
+            Message=message,
+            Subject=subject,
+            MessageStructure='string'
+        )
+    except Exception as e:
+        print(f"Failed to publish message to subscribers: {str(e)}")
+    
 
 def post_materials(request):
     user_id = request.headers['User-id']
@@ -25,13 +68,13 @@ def post_materials(request):
     if serializer.is_valid():
         if 'file' in request.FILES:
             serializer.validated_data['file'].name = str(uuid.uuid4()) + '.' + data_['file_name'].split('.')[-1]
-        object_ = serializer.save()
-        
-        #Notify all subscribers
-        user.followers_set.all()  
-        
+        object_ = serializer.save() 
+
+        # Publish message to SNS topic for each subscriber
+        notify_subscribers(serializer, user)
+
         return Response({"Success": "Successfully Created", "created_id": object_.id}, status=status.HTTP_201_CREATED)
-        
+
     return Response({'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST) 
 
 def get_materials(request):

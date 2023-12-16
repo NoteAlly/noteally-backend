@@ -12,7 +12,6 @@ class TestDownloadsView(APITestCase):
     def setUp(self):
         self = fill_db(self)
     
-    
     @patch('noteally_app.webservices.ws_downloads.boto3')
     def test_download_material(self, mock_boto3):
         # mock response from boto3

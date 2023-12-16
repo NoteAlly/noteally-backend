@@ -5,6 +5,10 @@ from rest_framework.response import Response
 from noteally_app.CustomPagination import CustomPagination
 from noteally_app.serializers import SubsUserSerializer, FollowerSerializer
 from noteally_app.models import User, Follower
+from noteally_app.webservices.ws_auth import get_cognito_user
+import boto3
+from botocore.client import Config
+from django.conf import settings
 
 USER_NOT_FOUND_RESPONSE = {'error': 'User not found'}
 
@@ -25,9 +29,37 @@ def unlock_premium(request):
     
     return Response({'user_id': user.id, 'message': 'Premium unlocked'}, status=status.HTTP_200_OK)
 
+# Subscribe the user to the SNS topic to allow notifications of new uploads
+def subscribe_to_sns_topic(user, user_to_follow):
+    # Obtain the topic ARN
+    topic_name = f'uploads-user-{user_to_follow.id}'
+    topic_arn = f'arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:{topic_name}'
+    print(f"Topic ARN: {topic_arn}")
 
-@api_view(['POST'])
-@cognito_login_required
+    # Presigned URL - SNS
+    sns_client = boto3.client(
+        service_name='sns',
+        region_name=settings.AWS_REGION_NAME,
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        config=Config(signature_version='s3v4')
+    )
+
+    # Create a new topic for the user to follow if it doesn't exist
+    response = sns_client.list_topics()
+    existing_topics = [topic['TopicArn'] for topic in response.get('Topics', [])]
+    if topic_arn not in existing_topics:
+        # Create a new topic for the user to follow if it doesn't exist
+        sns_client.create_topic(Name=topic_name)
+
+    # Subscribe the user to the topic
+    sns_client.subscribe(
+        TopicArn=topic_arn,
+        Protocol='email',  
+        Endpoint=user.email  
+    )
+
+@api_view(['POST']) 
 def subscribe(request, user_id): 
     try:
         user_to_follow = User.objects.get(id=user_id)
@@ -41,6 +73,9 @@ def subscribe(request, user_id):
 
     # Create a new follower relationship
     Follower.objects.create(follower=user, following=user_to_follow)
+
+    # Subscribe the user to the SNS topic of the user to follow
+    subscribe_to_sns_topic(user, user_to_follow)
 
     return Response({'message': 'Successfully subscribed'}, status=status.HTTP_201_CREATED)
 
