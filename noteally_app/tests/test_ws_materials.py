@@ -5,6 +5,7 @@ from django.urls import reverse
 from noteally_app.tests.fill_db import fill_db
 from rest_framework.exceptions import ErrorDetail
 import shutil
+from django.conf import settings
 
 # For Mocking Notifications
 from unittest.mock import patch, MagicMock
