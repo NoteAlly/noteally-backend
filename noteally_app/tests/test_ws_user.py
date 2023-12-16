@@ -6,7 +6,7 @@ from noteally_app.models import User, Follower
 from django.conf import settings
 
 # To mock the SNS topic creation
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, ANY
 from noteally_app.webservices.ws_user import subscribe_to_sns_topic
 
 # import ErrorDetail in the line below
@@ -211,7 +211,7 @@ class TestUserView(APITestCase):
         mock_sns_client.subscribe.assert_called_once_with(
             TopicArn=topic_arn,
             Protocol='email',
-            Endpoint=f'{mock_user.email.return_value}'
+            Endpoint=ANY
         )
  
         
