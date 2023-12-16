@@ -72,10 +72,7 @@ def post_materials(request):
     if serializer.is_valid():
         if 'file' in request.FILES:
             serializer.validated_data['file'].name = str(uuid.uuid4()) + '.' + data_['file_name'].split('.')[-1]
-        object_ = serializer.save()
-        
-        #Notify all subscribers
-        subscribers = user.followers_set.all()  
+        object_ = serializer.save() 
 
         # Publish message to SNS topic for each subscriber
         notify_subscribers(serializer, user)
