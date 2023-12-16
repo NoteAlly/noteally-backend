@@ -120,20 +120,26 @@ class TestUserView(APITestCase):
         # Set up the desired behavior for subscribe
         mock_boto3.subscribe.return_value = {'SubscriptionArn': 'test_subscription_arn'}
 
-        url = reverse('subscribe', args=[self.user1.id])
-        headers = {'User-id': self.user2.id}
+        # Mock the part of the code that generates topic_name and topic_arn
+        with patch('__main__.subscribe_to_sns_topic') as mock_subscribe_to_sns_topic:
+            # Assuming self.user1 and self.user2 are defined earlier in your test setup
+            url = reverse('subscribe', args=[self.user1.id])
+            headers = {'User-id': self.user2.id}
 
-        response = self.client.post(url, headers=headers)
+            response = self.client.post(url, headers=headers)
 
-        expected_response = {
-            'message': 'Successfully subscribed'
-        }
+            expected_response = {
+                'message': 'Successfully subscribed'
+            }
 
-        # Assert the response status code
-        self.assertEqual(response.status_code, 201)
+            # Assert the response status code
+            self.assertEqual(response.status_code, 201)
 
-        # Assert the response data
-        self.assertEqual(response.data, expected_response) 
+            # Assert the response data
+            self.assertEqual(response.data, expected_response)
+
+            # Assert that subscribe_to_sns_topic was called with the correct arguments
+            mock_subscribe_to_sns_topic.assert_called_once_with(self.user2, self.user1)
 
     def test_unsubscribe(self):
         # Assuming self.user2 is already subscribed to self.user1
