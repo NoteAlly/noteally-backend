@@ -182,10 +182,13 @@ class TestUserView(APITestCase):
     @patch('noteally_app.webservices.ws_user.boto3')
     def test_user_sns_topic_creation(self, mock_boto3):
         # mock response from boto3
-        mock_boto3.client.return_value = MagicMock()
-        mock_boto3.client.return_value.create_topic.return_value = {'TopicArn': 'test_topic_arn'}
-        mock_boto3.list_topics = {'Topics': []}
-        mock_boto3.subscribe.return_value = {'SubscriptionArn': 'test_subscription_arn'}
+        mock_sns_client = MagicMock()
+        mock_sns_client.create_topic.return_value = {'TopicArn': 'test_topic_arn'}
+        mock_sns_client.list_topics.return_value = {'Topics': []}
+        mock_sns_client.subscribe.return_value = {'SubscriptionArn': 'test_subscription_arn'}
+
+        # Set the return_value of boto3.client to our mocked sns_client
+        mock_boto3.client.return_value = mock_sns_client
 
         # Mock the user to follow
         mock_user = MagicMock()
@@ -200,12 +203,13 @@ class TestUserView(APITestCase):
         # Subscribe the user to the SNS topic to allow notifications of new uploads
         subscribe_to_sns_topic(mock_user, mock_user)
 
-        mock_boto3.client.list_topics.assert_called_once()
+        # Assertions after the code that triggers the calls to the mocked objects
+        mock_sns_client.list_topics.assert_called_once()
 
         # Create a new topic for the user to follow if it doesn't exist
-        if topic_arn not in mock_boto3.client.list_topics.return_value['Topics']:
-            mock_boto3.client.create_topic.assert_called_once_with(Name=topic_name)
-            mock_boto3.client.subscribe.assert_called_once_with(
+        if topic_arn not in mock_sns_client.list_topics.return_value['Topics']:
+            mock_sns_client.create_topic.assert_called_once_with(Name=topic_name)
+            mock_sns_client.subscribe.assert_called_once_with(
                 TopicArn=topic_arn,
                 Protocol='email',
                 Endpoint=f'{mock_user.first_name} {mock_user.last_name} <{mock_user.email}>'
