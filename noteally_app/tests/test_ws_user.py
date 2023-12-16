@@ -180,7 +180,6 @@ class TestUserView(APITestCase):
     
     
     @patch('noteally_app.webservices.ws_user.boto3')
-    @patch('noteally_app.webservices.ws_user.subscribe_to_sns_topic')
     def test_user_sns_topic_creation(self, mock_boto3):
         # mock response from boto3
         mock_boto3.client.return_value = MagicMock()
@@ -197,6 +196,9 @@ class TestUserView(APITestCase):
         # Subscribe the user to the SNS topic to allow notifications of new uploads
         topic_name = f'uploads-user-{mock_user.id}'
         topic_arn = f'arn:aws:sns:{settings.AWS_REGION_NAME}:{settings.AWS_ACCOUNT_ID}:{topic_name}'
+
+        # Subscribe the user to the SNS topic to allow notifications of new uploads
+        subscribe_to_sns_topic(mock_user, mock_user)
 
         mock_boto3.client.list_topics.assert_called_once()
 
