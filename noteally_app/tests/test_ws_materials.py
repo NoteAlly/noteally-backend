@@ -90,30 +90,44 @@ class TestMaterialsView(APITestCase):
         # Assert the response data
         self.assertEqual(response.data, expected_response)
         
-    
-    def test_post_material_no_file(self):
-        data = {
-            "user": self.user1.id,
-            "name": "Introduction to Programming3",
-            "description": "Introduction to Programming3",
-            "price": 0,
-            "university": self.university1.id,
-            "study_areas": [self.study_area1.id, self.study_area2.id],
-        }
+    @patch('noteally_app.webservices.ws_materials.boto3')
+    def test_post_material_no_file(self, mock_boto3):
+        # mock response from boto3
+        mock_boto3.client.return_value = MagicMock()
         
-        response = self.client.post(self.url, data, headers=self.header, format='multipart')
-        
-        expected_response = {
-            "Success": "Successfully Created",
-            "created_id": response.data['created_id'],
-        }
-        
-        # Assert the response status code
-        self.assertEqual(response.status_code, 201)
-        
-        # Assert the response data
-        self.assertEqual(response.data, expected_response)
+        # Set up the desired behavior for list_topics
+        mock_boto3.list_topics = {'Topics': []}
 
+        # Set up the desired behavior for create_topic
+        mock_boto3.create_topic = {'TopicArn': 'test_topic_arn'}
+
+        
+        # Mock the part of the code that generates topic_name and topic_arn
+        with patch('noteally_app.webservices.ws_materials.notify_subscribers') as mock_notify_subscribers:
+            data = {
+                "user": self.user1.id,
+                "name": "Introduction to Programming3",
+                "description": "Introduction to Programming3",
+                "price": 0,
+                "university": self.university1.id,
+                "study_areas": [self.study_area1.id, self.study_area2.id],
+            }
+            
+            response = self.client.post(self.url, data, headers=self.header, format='multipart')
+            
+            expected_response = {
+                "Success": "Successfully Created",
+                "created_id": response.data['created_id'],
+            }
+            
+            # Assert the response status code
+            self.assertEqual(response.status_code, 201)
+            
+            # Assert the response data
+            self.assertEqual(response.data, expected_response)
+
+            # Assert that subscribe_to_sns_topic was called with the correct arguments
+            mock_notify_subscribers.assert_called_once()
 
     def test_get_materials_no_filter(self):
         response = self.client.get(self.url)
