@@ -180,6 +180,7 @@ class TestUserView(APITestCase):
     
     
     @patch('noteally_app.webservices.ws_user.boto3')
+    @patch('noteally_app.webservices.ws_user.subscribe_to_sns_topic')
     def test_user_sns_topic_creation(self, mock_boto3):
         # mock response from boto3
         mock_boto3.client.return_value = MagicMock()
