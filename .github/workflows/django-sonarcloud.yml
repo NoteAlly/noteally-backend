@@ -1,43 +1,93 @@
-name: Build
+name: SonarCloud Scan
 on:
   push:
     branches:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   sonarcloud:
     name: SonarCloud
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     concurrency:
-      group: SonarcloudAndTesting
+      group: Sonarcloud
     steps:
-
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis, this action controls how much of the Git history is fetched when checking out the repository.
 
-      - name: Install Dependencies
+      - name: Auth Service Coverage
         run: |
+          cd auth-service/
+          python -m venv venv
+          source venv/bin/activate
           pip install -r requirements.txt
-      - name: Create env
-        run: |
           echo "DJANGO_KEY=${{ secrets.DJANGO_KEY }}" >> .env
-
-      - name: Run Tests with Code Coverage
-        run: |
           coverage run manage.py test --settings=NoteAlly.test_settings
-
-      - name: Generate Coverage Report
+          deactivate
+          cd ..
+      
+      - name: Info Service Coverage
         run: |
+          cd info-service/
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          echo "DJANGO_KEY=${{ secrets.DJANGO_KEY }}" >> .env
+          coverage run manage.py test --settings=NoteAlly.test_settings
+          deactivate
+          cd ..
+
+      - name: Material Service Coverage
+        run: |
+          cd material-service/
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          echo "DJANGO_KEY=${{ secrets.DJANGO_KEY }}" >> .env
+          coverage run manage.py test --settings=NoteAlly.test_settings
+          deactivate
+          cd ..
+
+      - name: Tutor Service Coverage
+        run: |
+          cd tutor-service/
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          echo "DJANGO_KEY=${{ secrets.DJANGO_KEY }}" >> .env
+          coverage run manage.py test --settings=NoteAlly.test_settings
+          deactivate
+          cd ..
+      
+      - name: User Service Coverage
+        run: |
+          cd user-service/
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          echo "DJANGO_KEY=${{ secrets.DJANGO_KEY }}" >> .env
+          coverage run manage.py test --settings=NoteAlly.test_settings
+          deactivate
+          cd ..
+
+      - name: Join Coverage Reports and Generate Coverage Report
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          coverage combine */.coverage
           coverage xml -o coverage.xml
+          deactivate
       
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v2
         with:
           name: coverage-report
           path: coverage.xml  # Adjust the file path to match the location of your coverage report
-      
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:

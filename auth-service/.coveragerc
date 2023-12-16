@@ -1,0 +1,5 @@
+[run]
+include = noteally_app/webservices/*
+
+[report]
+fail_under = 80
