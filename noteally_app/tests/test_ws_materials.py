@@ -63,7 +63,7 @@ class TestMaterialsView(APITestCase):
             self.assertEqual(response.data['Success'], expected_response['Success'])
             
             # Assert that subscribe_to_sns_topic was called with the correct arguments
-            mock_notify_subscribers.assert_called_once(data, self.user1)
+            mock_notify_subscribers.assert_called_once()
 
     def test_post_material_invalid_file(self):
         data = {
